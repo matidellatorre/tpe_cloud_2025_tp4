@@ -57,6 +57,12 @@ module "http_api" {
       filename      = "${path.module}/functions/lambda_post_pool_requests.zip"
       handler       = "lambda_post_pool_requests.handler"
     }
+    get_presigned_url = {
+      route_key     = "POST /images/presigned-url"
+      function_name = "get_presigned_url"
+      filename      = "${path.module}/functions/lambda_get_presigned_url.zip"
+      handler       = "lambda_get_presigned_url.handler"
+    }
   }
 
   role            = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
@@ -71,6 +77,7 @@ module "http_api" {
     DB_NAME     = aws_db_instance.this.db_name
     DB_USER     = var.db_username
     DB_PASSWORD = var.db_password
+    IMAGES_BUCKET_NAME = aws_s3_bucket.images_bucket.bucket
   }
 
   depends_on = [aws_db_proxy_target.this, aws_lambda_layer_version.psycopg2]

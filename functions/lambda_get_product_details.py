@@ -38,7 +38,7 @@ def handler(event, context):
         product_id = event["pathParameters"]["id"]
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT id, name, description, category, unit_price, created_at, updated_at FROM product WHERE id = %s",
+                "SELECT id, name, description, category, unit_price, image_url, created_at, updated_at FROM product WHERE id = %s",
                 (product_id,),
             )
             product = cur.fetchone()
@@ -50,8 +50,9 @@ def handler(event, context):
                     "description": product[2],
                     "category": product[3],
                     "unit_price": float(product[4]) if product[4] is not None else None,
-                    "created_at": product[5].isoformat(),
-                    "updated_at": product[6].isoformat(),
+                    "image_url": product[5],
+                    "created_at": product[6].isoformat(),
+                    "updated_at": product[7].isoformat(),
                 }
 
                 return {

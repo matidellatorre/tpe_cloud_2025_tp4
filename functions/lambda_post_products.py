@@ -41,6 +41,7 @@ def handler(event, context):
             description = body.get("description")
             category = body.get("category")
             unit_price = body.get("unit_price")
+            image_url = body.get("image_url")
 
             if not all([name, unit_price]):
                 return {
@@ -49,8 +50,8 @@ def handler(event, context):
                 }
 
             cur.execute(
-                "INSERT INTO product (name, description, category, unit_price, created_at, updated_at) VALUES (%s, %s, %s, %s, NOW(), NOW()) RETURNING id",
-                (name, description, category, unit_price),
+                "INSERT INTO product (name, description, category, unit_price, image_url, created_at, updated_at) VALUES (%s, %s, %s, %s, %s, NOW(), NOW()) RETURNING id",
+                (name, description, category, unit_price, image_url),
             )
             product_id = cur.fetchone()[0]
             conn.commit()

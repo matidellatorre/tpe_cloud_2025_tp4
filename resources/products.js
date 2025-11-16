@@ -69,19 +69,36 @@ async function initializeProducts() {
             submitBtn.disabled = true;
             submitText.classList.add('hidden');
             submitLoading.classList.remove('hidden');
-            
-            const productData = {
-                name: document.getElementById('product-name').value,
-                description: document.getElementById('product-description').value,
-                unit_price: parseFloat(document.getElementById('product-price').value)
-            };
 
+            const imageFile = document.getElementById('product-image').files[0];
+            let imageUrl = null;
+            
             try {
+                // Step 1: If there's an image, upload it first.
+                if (imageFile) {
+                    console.log('Uploading file...');
+                    imageUrl = await window.apiClient.uploadFile(imageFile);
+                    if (!imageUrl) {
+                        // The error is already logged in uploadFile, just stop the process
+                        showNotification('Image upload failed. Please try again.', 'error');
+                        return; // Stop if upload fails
+                    }
+                    console.log('File uploaded. Image URL:', imageUrl);
+                }
+                
+                const productData = {
+                    name: document.getElementById('product-name').value,
+                    description: document.getElementById('product-description').value,
+                    unit_price: parseFloat(document.getElementById('product-price').value),
+                    image_url: imageUrl, // Use the URL from the upload
+                };
+
                 await window.apiClient.createProduct(productData);
                 await loadProducts(); // Reload products from API
                 closeModal();
                 showNotification('Product added successfully!');
             } catch (error) {
+                console.error("Error creating product:", error);
                 showNotification('Error creating product. Please try again.');
             } finally {
                 // Hide loading state
@@ -129,13 +146,12 @@ function renderProducts() {
 }
 
 function createProductCard(product) {
+    const imageUrl = product.image_url || 'https://placehold.co/600x400?text=No+Image';
     return `
         <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200">
-            <!-- Product Image Placeholder -->
+            <!-- Product Image -->
             <div class="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                <svg class="w-16 h-16 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                </svg>
+                <img src="${imageUrl}" alt="${product.name}" class="w-full h-full object-cover">
             </div>
             
             <div class="p-4">

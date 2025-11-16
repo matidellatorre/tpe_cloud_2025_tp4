@@ -43,6 +43,9 @@ function displayProductDetails(product) {
     document.getElementById('product-loading').classList.add('hidden');
     document.getElementById('product-details').classList.remove('hidden');
     
+    const imageUrl = product.image_url || 'https://placehold.co/600x400?text=No+Image';
+    document.getElementById('product-image').src = imageUrl;
+    document.getElementById('product-image').alt = product.name;
     document.getElementById('product-name').textContent = product.name;
     document.getElementById('product-description').textContent = product.description || 'No description available';
     document.getElementById('product-price').textContent = `$${product.unit_price.toFixed(2)}`;

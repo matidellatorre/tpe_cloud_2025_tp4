@@ -34,6 +34,7 @@ def create_tables(conn):
         description TEXT,
         category VARCHAR(100),
         unit_price DECIMAL(12,2) NOT NULL,
+        image_url VARCHAR(512),
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );

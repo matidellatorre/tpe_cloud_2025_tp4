@@ -106,6 +106,46 @@ class ApiClient {
             body: JSON.stringify(requestData)
         });
     }
+
+  async getPresignedUrl() {
+    return this.request('/images/presigned-url', {
+      method: 'POST',
+    });
+  }
+
+  async uploadFile(file) {
+    try {
+      // 1. Get the pre-signed URL from our backend
+      const { uploadURL, objectKey } = await this.getPresignedUrl();
+      if (!uploadURL) {
+        throw new Error('Failed to get a pre-signed URL.');
+      }
+
+      // 2. Upload the file directly to S3 using the pre-signed URL
+      const uploadResponse = await fetch(uploadURL, {
+        method: 'PUT',
+        body: file,
+        headers: {
+          'Content-Type': file.type,
+        },
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error('S3 upload failed.');
+      }
+
+      // 3. The public URL is the bucket URL + the object key.
+      const bucketUrl = uploadURL.split('?')[0].split('/').slice(0, -2).join('/');
+      const publicUrl = `${bucketUrl}/${objectKey}`;
+      
+      console.log('File uploaded successfully:', publicUrl);
+      return publicUrl;
+
+    } catch (error) {
+      console.error('Upload process failed:', error);
+      throw error; // Re-throw the error to be caught by the caller
+    }
+  }
 }
 
 // Crear instancia global del cliente API

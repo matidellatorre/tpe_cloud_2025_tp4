@@ -36,7 +36,7 @@ def handler(event, context):
 
     try:
         with conn.cursor() as cur:
-            cur.execute("SELECT id, name, description, category, unit_price, created_at, updated_at FROM product")
+            cur.execute("SELECT id, name, description, category, unit_price, image_url, created_at, updated_at FROM product")
             products = cur.fetchall()
             product_list = [
                 {
@@ -45,8 +45,9 @@ def handler(event, context):
                     "description": row[2],
                     "category": row[3],
                     "unit_price": float(row[4]) if row[4] is not None else None,
-                    "created_at": row[5].isoformat(),
-                    "updated_at": row[6].isoformat(),
+                    "image_url": row[5],
+                    "created_at": row[6].isoformat(),
+                    "updated_at": row[7].isoformat(),
                 }
                 for row in products
             ]
