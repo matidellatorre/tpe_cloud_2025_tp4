@@ -56,7 +56,7 @@ resource "aws_s3_bucket_cors_configuration" "images_bucket_cors" {
   cors_rule {
     allowed_headers = ["*"]
     allowed_methods = ["PUT", "POST"]
-    allowed_origins = ["*"] # For development. In production, restrict this to your domain.
+    allowed_origins = ["http://${module.s3_website.s3_bucket_website_endpoint}", "https://${module.s3_website.s3_bucket_website_endpoint}"]
     expose_headers  = []
     max_age_seconds = 3000
   }
