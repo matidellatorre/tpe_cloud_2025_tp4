@@ -47,8 +47,15 @@ def create_tables(conn):
         start_at DATE NOT NULL,
         end_at DATE NOT NULL,
         min_quantity INTEGER NOT NULL CHECK (min_quantity > 0),
+        
+        -- CAMPO NUEVO --
+        status VARCHAR(10) NOT NULL DEFAULT 'open', -- Valores: open, success, failed
+
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        
+        -- VALIDACIÓN AÑADIDA --
+        CHECK (status IN ('open', 'success', 'failed'))
     );
     """
 
@@ -65,6 +72,7 @@ def create_tables(conn):
 
     indexes = [
         "CREATE INDEX IF NOT EXISTS idx_pools_product_id ON pool(product_id);",
+        "CREATE INDEX IF NOT EXISTS idx_pools_status ON pool(status);",
         "CREATE INDEX IF NOT EXISTS idx_requests_pool_id ON request(pool_id);",
         "CREATE INDEX IF NOT EXISTS idx_requests_email ON request(email);",
         "CREATE INDEX IF NOT EXISTS idx_products_category ON product(category);",

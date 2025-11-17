@@ -35,6 +35,7 @@ output "cognito_user_pool_client_id" {
   value       = aws_cognito_user_pool_client.this.id
 }
 
-# Dominio de Cognito eliminado
-
-# Outputs de Cognito Hosted UI eliminados - usamos páginas propias
+output "sns_topic_notifications_arn" {
+  description = "ARN del tópico de SNS para las notificaciones de pools"
+  value       = aws_sns_topic.pool_notifications.arn
+}

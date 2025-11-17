@@ -7,6 +7,7 @@ resource "aws_lambda_function" "this" {
   runtime          = var.runtime
   source_code_hash = filebase64sha512(var.filename)
   layers           = var.layers
+  timeout = 30
 
   vpc_config {
     subnet_ids         = var.subnet_ids

@@ -78,6 +78,7 @@ module "http_api" {
     DB_USER     = var.db_username
     DB_PASSWORD = var.db_password
     IMAGES_BUCKET_NAME = aws_s3_bucket.images_bucket.bucket
+    SNS_TOPIC_ARN = aws_sns_topic.pool_notifications.arn
   }
 
   depends_on = [aws_db_proxy_target.this, aws_lambda_layer_version.psycopg2]
@@ -87,4 +88,3 @@ module "http_api" {
   }
 }
 
-# API Gateway proxy eliminado - usamos páginas propias
