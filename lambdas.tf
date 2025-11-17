@@ -13,7 +13,7 @@ module "rds_init" {
   function_name = "rds_init"
   handler       = "lambda_rds_init.handler"
   role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
-  runtime       = local.lambda_runtime
+  runtime       = var.lambda_runtime
   layers        = [aws_lambda_layer_version.psycopg2.arn]
 
   subnet_ids      = module.vpc.private_lambda_subnet_ids

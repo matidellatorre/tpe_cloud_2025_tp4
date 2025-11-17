@@ -8,10 +8,6 @@ resource "aws_vpc" "this" {
   }
 }
 
-data "aws_availability_zones" "available" {
-  state = "available"
-}
-
 resource "aws_subnet" "lambda" {
   count             = var.az_count
   cidr_block        = cidrsubnet(var.vpc_cidr, local.new_bits, count.index)

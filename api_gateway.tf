@@ -66,7 +66,7 @@ module "http_api" {
   }
 
   role            = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
-  runtime         = local.lambda_runtime
+  runtime         = var.lambda_runtime
   subnet_ids      = module.vpc.private_lambda_subnet_ids
   security_groups = [aws_security_group.lambda.id]
   layers          = [aws_lambda_layer_version.psycopg2.arn]
