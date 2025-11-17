@@ -11,6 +11,10 @@ resource "aws_cognito_user_pool" "this" {
   }
 
   auto_verified_attributes = ["email"]
+
+  lambda_config {
+    post_confirmation = aws_lambda_function.cognito_trigger.arn
+  }
 }
 
 resource "aws_cognito_user_pool_client" "this" {
@@ -26,4 +30,3 @@ resource "aws_cognito_user_pool_client" "this" {
   ]
 }
 
-# Dominio de Cognito eliminado - usamos páginas propias

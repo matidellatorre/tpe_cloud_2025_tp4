@@ -44,3 +44,5 @@ python/
 
 # Respuesta de la invocación de Lambda
 lambda_init_response.json
+/functions/*.zip
+*.zip

@@ -46,3 +46,47 @@ resource "null_resource" "init_database" {
     command = "aws lambda invoke --function-name ${module.rds_init.function_name} --region ${var.aws_region} lambda_init_response.json"
   }
 }
+
+# Empaquetar el código
+data "archive_file" "lambda_cognito_trigger_zip" {
+  type        = "zip"
+  source_file = "${path.module}/functions/lambda_cognito_trigger.py"
+  output_path = "${path.module}/functions/lambda_cognito_trigger.zip"
+}
+
+# Crear la función
+resource "aws_lambda_function" "cognito_trigger" {
+  filename      = data.archive_file.lambda_cognito_trigger_zip.output_path
+  function_name = "${var.project_name}-cognito-trigger"
+  role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole" # Tu LabRole
+  handler       = "lambda_cognito_trigger.handler"
+  runtime       = "python3.11"
+  timeout       = 30
+
+  source_code_hash = data.archive_file.lambda_cognito_trigger_zip.output_base64sha512
+
+  # Conectamos a la VPC para usar el Endpoint de SNS que acabas de arreglar
+  vpc_config {
+    subnet_ids         = module.vpc.private_lambda_subnet_ids
+    security_group_ids = [aws_security_group.lambda.id]
+  }
+
+  environment {
+    variables = {
+      SNS_TOPIC_ARN = aws_sns_topic.pool_notifications.arn
+    }
+  }
+  
+  tags = {
+    Name = "${var.project_name}-cognito-trigger"
+  }
+}
+
+# Dar permiso a Cognito para invocar esta Lambda
+resource "aws_lambda_permission" "allow_cognito" {
+  statement_id  = "AllowCognitoInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cognito_trigger.function_name
+  principal     = "cognito-idp.amazonaws.com"
+  source_arn    = aws_cognito_user_pool.this.arn
+}
