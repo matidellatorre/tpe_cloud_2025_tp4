@@ -36,12 +36,14 @@ async function loadPoolDetails() {
 function displayPoolDetails() {
   document.getElementById("pool-loading").classList.add("hidden");
   document.getElementById("pool-details").classList.remove("hidden");
+
   document.getElementById("pool-product-name").textContent = poolProduct.name;
   document.getElementById("pool-product-description").textContent =
     poolProduct.description || "No description available";
   document.getElementById(
     "pool-unit-price"
   ).textContent = `$${poolProduct.unit_price.toFixed(2)}`;
+
   const today = new Date();
   const deadline = new Date(currentPool.end_at);
   const daysRemaining = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
@@ -61,6 +63,7 @@ function displayPoolDetails() {
   document.getElementById("pool-deadline").textContent = isExpired
     ? "Expired"
     : `${daysRemaining} days left`;
+
   const joined = currentPool.joined || 0;
   const remaining = Math.max(0, currentPool.min_quantity - joined);
 
@@ -71,23 +74,43 @@ function displayPoolDetails() {
   document.getElementById("pool-dates").textContent = `${formatDate(
     currentPool.start_at
   )} - ${formatDate(currentPool.end_at)}`;
+
   const progress = Math.min(100, (joined / currentPool.min_quantity) * 100);
   document.getElementById("pool-progress-bar").style.width = `${progress}%`;
   document.getElementById(
     "pool-progress-text"
   ).textContent = `${joined}/${currentPool.min_quantity} participants`;
+
   const joinBtn = document.getElementById("join-pool-btn");
-  if (isExpired) {
-    joinBtn.textContent = "Pool Expired";
-    joinBtn.disabled = true;
-    joinBtn.className =
-      "bg-gray-300 text-gray-500 px-6 py-3 rounded-lg font-medium cursor-not-allowed";
+  const userRole = localStorage.getItem("user_role");
+  const canJoinPool = userRole === "client";
+
+  if (!canJoinPool) {
+    if (joinBtn) {
+      joinBtn.style.display = "none";
+    }
+  } else if (isExpired) {
+    if (joinBtn) {
+      joinBtn.textContent = "Pool Expired";
+      joinBtn.disabled = true;
+      joinBtn.className =
+        "bg-gray-300 text-gray-500 px-6 py-3 rounded-lg font-medium cursor-not-allowed";
+      joinBtn.style.display = "block";
+    }
   } else if (joined >= currentPool.min_quantity) {
-    joinBtn.textContent = "Pool Complete";
-    joinBtn.disabled = true;
-    joinBtn.className =
-      "bg-green-500 text-white px-6 py-3 rounded-lg font-medium cursor-not-allowed";
+    if (joinBtn) {
+      joinBtn.textContent = "Pool Complete";
+      joinBtn.disabled = true;
+      joinBtn.className =
+        "bg-green-500 text-white px-6 py-3 rounded-lg font-medium cursor-not-allowed";
+      joinBtn.style.display = "block";
+    }
+  } else {
+    if (joinBtn) {
+      joinBtn.style.display = "block";
+    }
   }
+
   displayPoolRequests();
 }
 

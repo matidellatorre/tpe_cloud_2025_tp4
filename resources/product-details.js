@@ -34,16 +34,23 @@ function displayProductDetails(product) {
   document.getElementById("product-loading").classList.add("hidden");
   document.getElementById("product-details").classList.remove("hidden");
 
-  const imageUrl =
-    product.image_url || "https://placehold.co/600x400?text=No+Image";
+  const imageUrl = product.image_url || "https://placehold.co/600x400?text=No+Image";
   document.getElementById("product-image").src = imageUrl;
   document.getElementById("product-image").alt = product.name;
   document.getElementById("product-name").textContent = product.name;
-  document.getElementById("product-description").textContent =
-    product.description || "No description available";
-  document.getElementById(
-    "product-price"
-  ).textContent = `$${product.unit_price.toFixed(2)}`;
+  document.getElementById("product-description").textContent = product.description || "No description available";
+  document.getElementById("product-price").textContent = `$${product.unit_price.toFixed(2)}`;
+
+  // Hide "Create Pool for this Product" button for non-company users
+  const createPoolBtn = document.querySelector('button[onclick="createPoolFromDetails()"]');
+  const userRole = localStorage.getItem("user_role");
+  if (createPoolBtn) {
+    if (userRole === "company") {
+      createPoolBtn.classList.remove("hidden");
+    } else {
+      createPoolBtn.classList.add("hidden");
+    }
+  }
 }
 
 async function loadRelatedPools(productId) {
@@ -72,6 +79,10 @@ function displayRelatedPools() {
 }
 
 function createPoolCard(pool) {
+  // Get user role to conditionally show Join Pool button
+  const userRole = localStorage.getItem("user_role");
+  const canJoinPool = userRole === "client";
+
   const today = new Date();
   const deadline = new Date(pool.end_at);
   const daysRemaining = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
@@ -96,7 +107,7 @@ function createPoolCard(pool) {
                     ${isExpired ? "Expired" : "Active"}
                 </span>
             </div>
-            
+
             <div class="mb-4 bg-purple-50 rounded-lg p-4">
                 <div class="flex justify-between items-center mb-2">
                     <div>
@@ -111,7 +122,7 @@ function createPoolCard(pool) {
                   pool.min_quantity
                 } units</p>
             </div>
-            
+
             <div class="flex items-center justify-between text-sm text-gray-600 mb-4 pb-4 border-b border-gray-200">
                 <div class="flex items-center space-x-1">
                     <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -125,16 +136,17 @@ function createPoolCard(pool) {
                 </div>
                 <div></div>
             </div>
-            
+
             <div class="flex space-x-2">
-                ${
-                  !isExpired
-                    ? `
+                ${!isExpired && canJoinPool ? `
                     <button onclick="joinPool(${pool.id})" class="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-md">
                         Join Pool
                     </button>
-                `
-                    : `
+                ` : !isExpired ? `
+                    <button disabled class="flex-1 bg-gray-300 text-gray-500 px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed" title="Only clients can join pools">
+                        Join Pool
+                    </button>
+                ` : `
                     <button disabled class="flex-1 bg-gray-300 text-gray-500 px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed">
                         Expired
                     </button>

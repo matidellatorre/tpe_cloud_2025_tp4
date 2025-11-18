@@ -17,6 +17,18 @@ async function initializeProducts() {
   const closeModalBtn = document.getElementById("close-modal-btn");
   const cancelModalBtn = document.getElementById("cancel-modal-btn");
   const addProductForm = document.getElementById("add-product-form");
+
+  // Check user role and show/hide Add Product button
+  const userRole = localStorage.getItem("user_role");
+  if (addProductBtn) {
+    if (userRole === "company") {
+      addProductBtn.classList.remove("hidden");
+    } else {
+      addProductBtn.classList.add("hidden");
+    }
+  }
+
+  // Load products from API
   await loadProducts();
   if (addProductBtn) {
     addProductBtn.addEventListener("click", () => {

@@ -6,8 +6,14 @@ class CognitoAuth {
   }
 
   init() {
-    this.checkAuthStatus();
+    const isAuth = this.checkAuthStatus();
+    if (isAuth) {
+      this.fetchAndSaveUserRole().catch(err => {
+        console.error('Error fetching user role on init:', err);
+      });
+    }
   }
+
   checkAuthStatus() {
     const accessToken = localStorage.getItem("cognito_access_token");
     const timestamp = localStorage.getItem("cognito_timestamp");
@@ -30,6 +36,7 @@ class CognitoAuth {
     this.user = this.parseUserFromToken(accessToken);
     return true;
   }
+
   parseUserFromToken(token) {
     try {
       const payload = JSON.parse(atob(token.split(".")[1]));
@@ -43,6 +50,7 @@ class CognitoAuth {
       return null;
     }
   }
+
   login() {
     const cognitoDomain = window.API_CONFIG.cognito.domain;
     const clientId = window.API_CONFIG.cognito.clientId;
@@ -59,6 +67,7 @@ class CognitoAuth {
 
     window.location.href = loginUrl;
   }
+
   signup() {
     const cognitoDomain = window.API_CONFIG.cognito.domain;
     const clientId = window.API_CONFIG.cognito.clientId;
@@ -75,6 +84,7 @@ class CognitoAuth {
 
     window.location.href = signupUrl;
   }
+
   logout() {
     localStorage.removeItem("cognito_access_token");
     localStorage.removeItem("cognito_id_token");
@@ -83,11 +93,13 @@ class CognitoAuth {
     localStorage.removeItem("cognito_expires_in");
     localStorage.removeItem("cognito_timestamp");
     localStorage.removeItem("user_email");
+    localStorage.removeItem("user_role");
 
     this.isAuthenticated = false;
     this.user = null;
     window.location.href = "index.html";
   }
+
   async refreshToken() {
     const refreshToken = localStorage.getItem("cognito_refresh_token");
 
@@ -304,6 +316,7 @@ class CognitoAuth {
       throw error;
     }
   }
+
   _saveTokens(authResult) {
     localStorage.setItem("cognito_access_token", authResult.AccessToken);
     localStorage.setItem("cognito_id_token", authResult.IdToken);
@@ -311,11 +324,34 @@ class CognitoAuth {
     localStorage.setItem("cognito_token_type", authResult.TokenType);
     localStorage.setItem("cognito_expires_in", authResult.ExpiresIn);
     localStorage.setItem("cognito_timestamp", Date.now().toString());
+
     const user = this.parseUserFromToken(authResult.AccessToken);
     if (user && user.email) {
       localStorage.setItem("user_email", user.email);
     }
   }
+
+  async fetchAndSaveUserRole() {
+    try {
+      if (!window.apiClient) {
+        console.warn('API client not available');
+        return null;
+      }
+
+      const roleData = await window.apiClient.getUserRole();
+      if (roleData && roleData.role) {
+        localStorage.setItem('user_role', roleData.role);
+        return roleData.role;
+      } else {
+        localStorage.removeItem('user_role');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+      return null;
+    }
+  }
+
   _getErrorMessage(error) {
     if (error.message) {
       if (error.message.includes("UserNotFoundException")) {
@@ -335,4 +371,5 @@ class CognitoAuth {
     return error.message || "Error desconocido";
   }
 }
+
 window.cognitoAuth = new CognitoAuth();

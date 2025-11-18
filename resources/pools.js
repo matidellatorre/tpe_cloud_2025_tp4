@@ -12,6 +12,38 @@ document.addEventListener("DOMContentLoaded", function () {
 let poolsData = [];
 let productsData = [];
 
+// Get user role from localStorage or fetch from API
+async function getUserRole() {
+    // First check localStorage
+    let role = localStorage.getItem('user_role');
+
+    // If not in localStorage and user is authenticated, fetch from API
+    if (!role && window.cognitoAuth && window.cognitoAuth.isLoggedIn()) {
+        try {
+            role = await window.cognitoAuth.fetchAndSaveUserRole();
+        } catch (error) {
+            console.error('Error fetching user role:', error);
+        }
+    }
+
+    return role;
+}
+
+// Update UI based on user role
+async function updateUIBasedOnRole() {
+    const createPoolBtn = document.getElementById('create-pool-btn');
+    if (!createPoolBtn) return;
+
+    const role = await getUserRole();
+
+    // Only show Create Pool button for company users
+    if (role === 'company') {
+        createPoolBtn.classList.remove('hidden');
+    } else {
+        createPoolBtn.classList.add('hidden');
+    }
+}
+
 async function initializePools() {
   const createPoolBtn = document.getElementById("create-pool-btn");
   const modal = document.getElementById("create-pool-modal");
@@ -19,13 +51,35 @@ async function initializePools() {
   const cancelModalBtn = document.getElementById("cancel-modal-btn");
   const createPoolForm = document.getElementById("create-pool-form");
   const productSelect = document.getElementById("pool-product");
+
+  // Check user role and show/hide Create Pool button
+  await updateUIBasedOnRole();
+
+  // Set minimum date for deadline to today
   const deadlineInput = document.getElementById("pool-deadline");
   if (deadlineInput) {
     const today = new Date().toISOString().split("T")[0];
     deadlineInput.setAttribute("min", today);
   }
+
+  // Load pools from API
   await loadPools();
+
+  // Load products for the form
   await loadProductsForForm();
+
+  // If role wasn't in localStorage, wait a bit and refresh UI after role is fetched
+  if (!localStorage.getItem("user_role") && window.cognitoAuth && window.cognitoAuth.isLoggedIn()) {
+    setTimeout(async () => {
+      await updateUIBasedOnRole();
+      // Re-render pools to update Join Pool buttons
+      if (poolsData.length > 0) {
+        renderPools();
+      }
+    }, 1000);
+  }
+
+  // Product selection preview
   if (productSelect) {
     productSelect.addEventListener("change", (e) => {
       const productId = parseInt(e.target.value);
@@ -33,14 +87,19 @@ async function initializePools() {
         const product = productsData.find((p) => p.id === productId);
         if (product) {
           showProductPreview(product);
+        } else {
+          hideProductPreview();
         }
       } else {
         hideProductPreview();
       }
     });
   }
+
+  // Modal controls
   if (createPoolBtn) {
     createPoolBtn.addEventListener("click", async () => {
+      // Recargar productos cada vez que se abre el modal
       await loadProductsForForm();
       modal.classList.remove("hidden");
       modal.classList.add("flex");
@@ -178,10 +237,16 @@ function renderPools() {
 function createPoolCard(pool) {
   const capacity = pool.min_quantity || 1;
   const price = pool.product?.unit_price || pool.unit_price || 0;
+
+  // Calculate days remaining usando end_at
   const today = new Date();
   const deadline = new Date(pool.end_at);
   const daysRemaining = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
   const isExpired = daysRemaining < 0;
+
+  // Get user role to conditionally show Join Pool button
+  const userRole = localStorage.getItem("user_role");
+  const canJoinPool = userRole === "client";
 
   return `
         <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-6 border border-gray-200">
@@ -202,7 +267,7 @@ function createPoolCard(pool) {
                     ${isExpired ? "Expired" : "Active"}
                 </span>
             </div>
-            
+
             <div class="mb-4 bg-purple-50 rounded-lg p-4">
                 <div class="flex justify-between items-center mb-2">
                     <div>
@@ -215,7 +280,7 @@ function createPoolCard(pool) {
                 </div>
                 <p class="text-xs text-gray-600">Minimum quantity: ${capacity} units</p>
             </div>
-            
+
             <div class="flex items-center justify-between text-sm text-gray-600 mb-4 pb-4 border-b border-gray-200">
                 <div class="flex items-center space-x-1">
                     <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -231,16 +296,17 @@ function createPoolCard(pool) {
                     ${formatDate(pool.start_at)} - ${formatDate(pool.end_at)}
                 </div>
             </div>
-            
+
             <div class="flex space-x-2">
-                ${
-                  !isExpired
-                    ? `
+                ${!isExpired && canJoinPool ? `
                     <button onclick="joinPool(${pool.id})" class="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-md">
                         Join Pool
                     </button>
-                `
-                    : `
+                ` : !isExpired ? `
+                    <button disabled class="flex-1 bg-gray-300 text-gray-500 px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed" title="Only clients can join pools">
+                        Join Pool
+                    </button>
+                ` : `
                     <button disabled class="flex-1 bg-gray-300 text-gray-500 px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed">
                         Expired
                     </button>

@@ -87,7 +87,19 @@
           try {
             errorDiv.classList.add("hidden");
             await window.cognitoAuth.loginWithPassword(email, password);
-            localStorage.setItem("user_email", email);
+
+            // Save user email in localStorage
+            localStorage.setItem('user_email', email);
+
+            // Fetch and save user role
+            try {
+              await window.cognitoAuth.fetchAndSaveUserRole();
+            } catch (roleError) {
+              console.error("Error fetching role:", roleError);
+              // Continue anyway, role can be fetched later
+            }
+
+            // Redirect to index after successful login
             window.location.href = "index.html";
           } catch (error) {
             errorDiv.textContent = error.message || "Error signing in";

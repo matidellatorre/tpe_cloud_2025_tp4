@@ -115,17 +115,36 @@
           try {
             errorDiv.classList.add("hidden");
             successDiv.classList.add("hidden");
+
+            // Confirm signup with the code
             await window.cognitoAuth.confirmSignup(email, code);
+
+            // Get the role that was selected during signup
             const role = localStorage.getItem("pending_role");
+
+            // Log in the user automatically to get the token
             const password = localStorage.getItem("pending_password");
             if (password) {
               await window.cognitoAuth.login(email, password);
             }
+
+            // Set the user role if it was selected during signup
             if (role) {
               try {
                 await window.apiClient.setUserRole(email, role);
+                console.log("Role set successfully:", role);
               } catch (roleError) {
                 console.error("Error setting role:", roleError);
+              }
+            } else {
+              // If no pending role, try to fetch existing role
+              try {
+                const roleData = await window.apiClient.getUserRole();
+                if (roleData && roleData.role) {
+                  localStorage.setItem('user_role', roleData.role);
+                }
+              } catch (roleError) {
+                console.error("Error fetching role:", roleError);
               }
             }
             localStorage.setItem("user_email", email);
