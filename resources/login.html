@@ -1,13 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - Grupi</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1000.0.min.js"></script>
-    <script src="config.js"></script>
-    <script src="auth.js"></script>
   </head>
   <body class="bg-gray-50 min-h-screen flex items-center justify-center">
     <div class="max-w-md w-full space-y-8">
@@ -86,12 +83,18 @@
 
           try {
             errorDiv.classList.add("hidden");
-
-            // Use the login function from auth.js
             await window.cognitoAuth.loginWithPassword(email, password);
 
             // Save user email in localStorage
-            localStorage.setItem('user_email', email);
+            localStorage.setItem("user_email", email);
+
+            // Fetch and save user role
+            try {
+              await window.cognitoAuth.fetchAndSaveUserRole();
+            } catch (roleError) {
+              console.error("Error fetching role:", roleError);
+              // Continue anyway, role can be fetched later
+            }
 
             // Redirect to index after successful login
             window.location.href = "index.html";
@@ -101,5 +104,10 @@
           }
         });
     </script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1000.0.min.js"></script>
+    <script src="config.js"></script>
+    <script src="api-client.js"></script>
+    <script src="auth.js"></script>
+    <script src="nav-role-handler.js"></script>
   </body>
 </html>

@@ -1,13 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign Up - Grupi</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1000.0.min.js"></script>
-    <script src="config.js"></script>
-    <script src="auth.js"></script>
   </head>
   <body class="bg-gray-50 min-h-screen flex items-center justify-center">
     <div class="max-w-md w-full space-y-8">
@@ -25,31 +22,39 @@
         </p>
       </div>
       <form class="mt-8 space-y-6" id="signup-form">
-        <div class="rounded-md shadow-sm -space-y-px">
+        <div class="space-y-4">
           <div>
-            <label for="email" class="sr-only">Email</label>
+            <label for="email" class="block text-sm font-medium text-gray-700"
+              >Email</label
+            >
             <input
               id="email"
               name="email"
               type="email"
               required
-              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
+              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
               placeholder="Email"
             />
           </div>
           <div>
-            <label for="password" class="sr-only">Password</label>
+            <label
+              for="password"
+              class="block text-sm font-medium text-gray-700"
+              >Password</label
+            >
             <input
               id="password"
               name="password"
               type="password"
               required
-              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
-              placeholder="Password"
+              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+              placeholder="Password (min 8 characters)"
             />
           </div>
           <div>
-            <label for="confirm-password" class="sr-only"
+            <label
+              for="confirm-password"
+              class="block text-sm font-medium text-gray-700"
               >Confirm Password</label
             >
             <input
@@ -57,9 +62,57 @@
               name="confirm-password"
               type="password"
               required
-              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
+              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
               placeholder="Confirm Password"
             />
+          </div>
+
+          <!-- Role Selection -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >I want to:</label
+            >
+            <div class="space-y-2">
+              <label
+                class="flex items-start p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-600 transition-all duration-200"
+              >
+                <input
+                  type="radio"
+                  name="role"
+                  value="client"
+                  required
+                  class="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
+                />
+                <div class="ml-3">
+                  <span class="block text-sm font-medium text-gray-900"
+                    >Join pools and save money</span
+                  >
+                  <span class="block text-sm text-gray-500"
+                    >Browse products, join pools, and get bulk discounts</span
+                  >
+                </div>
+              </label>
+
+              <label
+                class="flex items-start p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-600 transition-all duration-200"
+              >
+                <input
+                  type="radio"
+                  name="role"
+                  value="company"
+                  required
+                  class="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
+                />
+                <div class="ml-3">
+                  <span class="block text-sm font-medium text-gray-900"
+                    >Create products and pools</span
+                  >
+                  <span class="block text-sm text-gray-500"
+                    >Sell products, create pools, and manage sales</span
+                  >
+                </div>
+              </label>
+            </div>
           </div>
         </div>
 
@@ -95,19 +148,27 @@
             document.getElementById("confirm-password").value;
           const errorDiv = document.getElementById("error-message");
           const successDiv = document.getElementById("success-message");
-
-          // Validate that passwords match
           if (password !== confirmPassword) {
             errorDiv.textContent = "Passwords do not match";
             errorDiv.classList.remove("hidden");
             successDiv.classList.add("hidden");
             return;
           }
-
-          // Validate password length
           if (password.length < 8) {
-            errorDiv.textContent =
-              "Password must be at least 8 characters";
+            errorDiv.textContent = "Password must be at least 8 characters";
+            errorDiv.classList.remove("hidden");
+            successDiv.classList.add("hidden");
+            return;
+          }
+
+          // Get selected role
+          const role = document.querySelector(
+            'input[name="role"]:checked'
+          )?.value;
+
+          // Validate role selection
+          if (!role) {
+            errorDiv.textContent = "Please select a role";
             errorDiv.classList.remove("hidden");
             successDiv.classList.add("hidden");
             return;
@@ -116,24 +177,21 @@
           try {
             errorDiv.classList.add("hidden");
             successDiv.classList.add("hidden");
-
-            // Use the signup function from auth.js
             await window.cognitoAuth.signupWithPassword(email, password);
 
-            // Save user email in localStorage
-            localStorage.setItem('user_email', email);
+            localStorage.setItem("user_email", email);
 
-            // Save email and password for use in confirmation
-            localStorage.setItem('pending_email', email);
-            localStorage.setItem('pending_password', password);
+            localStorage.setItem("pending_email", email);
+            localStorage.setItem("pending_password", password);
+            localStorage.setItem("pending_role", role);
 
             successDiv.textContent =
               "Account created successfully. Check your email for the verification code.";
             successDiv.classList.remove("hidden");
-
-            // Redirect to confirmation page after 2 seconds
             setTimeout(() => {
-              window.location.href = `confirm-email.html?email=${encodeURIComponent(email)}`;
+              window.location.href = `confirm-email.html?email=${encodeURIComponent(
+                email
+              )}`;
             }, 2000);
           } catch (error) {
             errorDiv.textContent = error.message || "Error creating account";
@@ -142,5 +200,9 @@
           }
         });
     </script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1000.0.min.js"></script>
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+    <script src="nav-role-handler.js"></script>
   </body>
 </html>

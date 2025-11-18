@@ -26,6 +26,33 @@ def get_db_connection():
         return None
 
 
+def get_user_sub_from_token(event):
+    try:
+        request_context = event.get("requestContext", {})
+        authorizer = request_context.get("authorizer", {})
+        claims = authorizer.get("claims", {})
+        if not claims:
+            jwt = authorizer.get("jwt", {})
+            claims = jwt.get("claims", {})
+        return claims.get("sub")
+    except Exception as e:
+        print(f"Error extracting sub from token: {e}")
+        return None
+
+
+def check_user_role(conn, sub, required_role):
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT role FROM user_role WHERE cognito_sub = %s", (sub,))
+            result = cur.fetchone()
+            if result:
+                return result[0] == required_role
+            return False
+    except Exception as e:
+        print(f"Error checking user role: {e}")
+        return False
+
+
 def handler(event, context):
     conn = get_db_connection()
     if conn is None:
@@ -35,6 +62,22 @@ def handler(event, context):
         }
 
     try:
+        user_sub = get_user_sub_from_token(event)
+        
+        if not user_sub:
+            return {
+                "statusCode": 401,
+                "headers": {"Access-Control-Allow-Origin": "*"},
+                "body": json.dumps({"error": "Unauthorized - no user ID found in token"}),
+            }
+        
+        if not check_user_role(conn, user_sub, "company"):
+            return {
+                "statusCode": 403,
+                "headers": {"Access-Control-Allow-Origin": "*"},
+                "body": json.dumps({"error": "Forbidden - only companies can create pools"}),
+            }
+        
         with conn.cursor() as cur:
             body = json.loads(event.get("body", "{}"))
             product_id = body.get("product_id")
@@ -45,6 +88,7 @@ def handler(event, context):
             if not all([product_id, start_at, end_at, min_quantity]):
                 return {
                     "statusCode": 400,
+                    "headers": {"Access-Control-Allow-Origin": "*"},
                     "body": json.dumps({"error": "Missing required fields"}),
                 }
 
@@ -65,6 +109,7 @@ def handler(event, context):
         print(f"Error executing query: {e}")
         return {
             "statusCode": 500,
+            "headers": {"Access-Control-Allow-Origin": "*"},
             "body": json.dumps(
                 {
                     "error": "An error occurred",

@@ -2,12 +2,12 @@
 
 Este proyecto define y despliega la infraestructura backend completa para la aplicación **Grupi**, un sistema de gestión de pools de compras que permite a usuarios:
 
-✅ Registrarse y autenticarse con Amazon Cognito  
-✅ Crear y gestionar productos  
-✅ Crear y unirse a pools de compras  
-✅ Realizar solicitudes de compra  
-✅ Persistir datos en base de datos RDS (PostgreSQL)  
-✅ Almacenar archivos estáticos en S3  
+* Registrarse y autenticarse con Amazon Cognito
+* Crear y gestionar productos
+* Crear y unirse a pools de compras
+* Realizar solicitudes de compra
+* Persistir datos en base de datos RDS (PostgreSQL)
+* Almacenar archivos estáticos en S3
 
 ---
 
@@ -58,7 +58,7 @@ La infraestructura se define completamente en **Terraform** y utiliza:
 │   └── *.zip                         # Archivos ZIP de las funciones
 ├── layers/                   # Capas Lambda
 │   ├── layer_psycopg2.zip    # Capa para PostgreSQL (psycopg2)
-│   └── python/              # Dependencias Python
+│   └── python/               # Dependencias Python
 ├── modules/                  # Módulos de Terraform
 │   ├── cloudfront/           # Módulo para CloudFront
 │   ├── http_api/             # Módulo para HTTP API
@@ -69,7 +69,7 @@ La infraestructura se define completamente en **Terraform** y utiliza:
 │   ├── *.js                  # JavaScript del frontend
 │   ├── *.css                 # Estilos CSS
 │   ├── package.json          # Dependencias npm
-│   └── tailwind.config.js     # Configuración de Tailwind CSS
+│   └── tailwind.config.js    # Configuración de Tailwind CSS
 ├── build-layers.sh           # Script para construir capas Lambda
 ├── compile-css.sh            # Script para compilar CSS
 └── zip-lambdas.sh            # Script para empaquetar Lambdas
@@ -150,7 +150,7 @@ aws configure
 
 Ingresa:
 - AWS Access Key ID
-- AWS Secret Access Key  
+- AWS Secret Access Key
 - Default region (ej: `us-east-1`)
 - Default output format (ej: `json`)
 
@@ -204,7 +204,7 @@ terraform plan
 terraform apply
 ```
 
-**⚠️ Importante**: Debido a la presencia del RDS Proxy, es necesario esperar unos minutos después del deploy para que el proxy termine de inicializarse completamente antes de poder hacer solicitudes a la API. El RDS Proxy puede tardar entre 2-5 minutos en estar completamente operativo.
+> **Importante:** Debido a la presencia del RDS Proxy, es necesario esperar unos minutos después del deploy para que el proxy termine de inicializarse completamente antes de poder hacer solicitudes a la API. El RDS Proxy puede tardar entre 2-5 minutos en estar completamente operativo.
 
 ---
 
@@ -227,4 +227,4 @@ Para destruir toda la infraestructura:
 terraform destroy
 ```
 
-**⚠️ Advertencia**: Esto eliminará todos los recursos, incluyendo la base de datos y los datos almacenados.
+> **Advertencia:** Esto eliminará todos los recursos, incluyendo la base de datos y los datos almacenados.

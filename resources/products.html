@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -46,57 +46,78 @@
             <a
               href="requests.html"
               class="nav-link text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
-             >Requests</a
-             >
- 
-             <!-- Auth buttons (when not logged in) -->
-             <div id="auth-buttons" class="flex items-center space-x-2 ml-4">
-               <a
-                 href="login.html"
-                 class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
-                 >Login</a
-               >
-               <a
-                 href="signup.html"
-                 class="border border-purple-600 text-purple-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-50 transition-colors"
-                 >Sign Up</a
-               >
-             </div>
- 
-             <!-- User info (when logged in) -->
-             <div id="user-info" class="relative ml-4 hidden">
-               <button
-                 type="button"
-                 id="user-menu-btn"
-                 class="flex items-center space-x-2 hover:bg-purple-50 rounded-lg px-3 py-2 transition-colors"
-               >
-                 <div
-                   id="user-avatar"
-                   class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white font-bold text-sm"
-                 ></div>
-                 <span id="user-name" class="text-sm font-medium text-gray-700"></span>
-                 <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                 </svg>
-               </button>
-               
-               <!-- Dropdown menu -->
-               <div
-                 id="user-dropdown"
-                 class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50"
-               >
-                 <button
-                   type="button"
-                   id="logout-btn"
-                   class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
-                 >
-                   Logout
-                 </button>
-               </div>
-             </div>
-           </div>
- 
-           <div class="md:hidden flex items-center">
+              >Requests</a
+            >
+            <a
+              href="analytics.html"
+              class="nav-link text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+              >Analytics</a
+            >
+
+            <!-- Auth buttons (when not logged in) -->
+            <div id="auth-buttons" class="flex items-center space-x-2 ml-4">
+              <a
+                href="login.html"
+                class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
+                >Login</a
+              >
+              <a
+                href="signup.html"
+                class="border border-purple-600 text-purple-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-50 transition-colors"
+                >Sign Up</a
+              >
+            </div>
+
+            <!-- User info (when logged in) -->
+            <div id="user-info" class="relative ml-4 hidden">
+              <button
+                type="button"
+                id="user-menu-btn"
+                class="flex items-center space-x-2 hover:bg-purple-50 rounded-lg px-3 py-2 transition-colors"
+              >
+                <div
+                  id="user-avatar"
+                  class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white font-bold text-base"
+                ></div>
+                <div class="flex flex-col">
+                  <span
+                    id="user-email"
+                    class="text-sm font-medium text-gray-900"
+                  ></span>
+                  <span id="user-role" class="text-xs text-gray-500"></span>
+                </div>
+                <svg
+                  class="w-4 h-4 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  ></path>
+                </svg>
+              </button>
+
+              <!-- Dropdown menu -->
+              <div
+                id="user-dropdown"
+                class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50"
+              >
+                <button
+                  type="button"
+                  id="logout-btn"
+                  class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="md:hidden flex items-center">
             <button
               id="mobile-menu-button"
               class="inline-flex items-center justify-center p-2 rounded-lg text-gray-700 hover:text-purple-600 hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500 transition-colors"
@@ -145,6 +166,11 @@
             class="text-gray-700 hover:text-purple-600 hover:bg-purple-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors"
             >Requests</a
           >
+          <a
+            href="analytics.html"
+            class="text-gray-700 hover:text-purple-600 hover:bg-purple-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors"
+            >Analytics</a
+          >
         </div>
       </div>
     </nav>
@@ -164,7 +190,7 @@
           </div>
           <button
             id="add-product-btn"
-            class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all flex items-center space-x-2"
+            class="hidden bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all flex items-center space-x-2"
           >
             <svg
               class="w-5 h-5"
@@ -238,13 +264,13 @@
 
     <div
       id="add-product-modal"
-      class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50"
+      class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50 p-4"
     >
       <div
-        class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-90vh overflow-y-auto"
+        class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col"
       >
         <div
-          class="px-6 py-4 border-b border-gray-200 flex justify-between items-center"
+          class="px-6 py-4 border-b border-gray-200 flex justify-between items-center flex-shrink-0"
         >
           <h3 class="text-xl font-bold text-gray-900">Add New Product</h3>
           <button
@@ -267,7 +293,7 @@
             </svg>
           </button>
         </div>
-        <form id="add-product-form" class="px-6 py-4">
+        <form id="add-product-form" class="px-6 py-4 overflow-y-auto flex-1">
           <div class="space-y-4">
             <div>
               <label
@@ -313,123 +339,180 @@
               />
             </div>
             <div>
-              <label for="product-image" class="block text-sm font-medium text-gray-700">Product Image</label>
-              <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+              <label
+                for="product-image"
+                class="block text-sm font-medium text-gray-700 mb-2"
+                >Product Image</label
+              >
+
+              <!-- Image Preview -->
+              <div id="image-preview-container" class="hidden mb-4">
+                <div class="relative inline-block max-w-full">
+                  <img
+                    id="image-preview"
+                    src=""
+                    alt="Preview"
+                    class="h-40 w-auto max-w-full rounded-lg border-2 border-purple-300 shadow-md object-contain"
+                  />
+                  <button
+                    type="button"
+                    id="remove-image-btn"
+                    class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow-lg"
+                  >
+                    <svg
+                      class="w-5 h-5"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Upload Area -->
+              <div
+                id="image-upload-area"
+                class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-purple-400 transition-colors"
+              >
                 <div class="space-y-1 text-center">
-                  <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  <svg
+                    class="mx-auto h-12 w-12 text-gray-400"
+                    stroke="currentColor"
+                    fill="none"
+                    viewBox="0 0 48 48"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
                   </svg>
                   <div class="flex text-sm text-gray-600">
-                    <label for="product-image" class="relative cursor-pointer bg-white rounded-md font-medium text-purple-600 hover:text-purple-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-purple-500">
+                    <label
+                      for="product-image"
+                      class="relative cursor-pointer bg-white rounded-md font-medium text-purple-600 hover:text-purple-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-purple-500"
+                    >
                       <span>Upload a file</span>
-                      <input id="product-image" name="product-image" type="file" class="sr-only" accept="image/jpeg">
+                      <input
+                        id="product-image"
+                        name="product-image"
+                        type="file"
+                        class="sr-only"
+                        accept="image/jpeg"
+                      />
                     </label>
-                    <p class="ml-2"> or drag and drop</p>
+                    <p class="ml-2">or drag and drop</p>
                   </div>
                   <p class="text-xs text-gray-500">JPEG images accepted</p>
                 </div>
               </div>
             </div>
           </div>
-          <div class="mt-6 flex justify-end space-x-3">
-            <button
-              type="button"
-              id="cancel-modal-btn"
-              class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              id="submit-product-btn"
-              class="px-6 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg font-medium shadow-md transition-all flex items-center space-x-2"
-            >
-              <span id="submit-product-text">Add Product</span>
-              <div id="submit-product-loading" class="hidden">
-                <div
-                  class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"
-                ></div>
-              </div>
-            </button>
-          </div>
         </form>
+        <div
+          class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end space-x-3 flex-shrink-0"
+        >
+          <button
+            type="button"
+            id="cancel-modal-btn"
+            class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-white transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            id="submit-product-btn"
+            form="add-product-form"
+            class="px-6 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg font-medium shadow-md transition-all flex items-center space-x-2"
+          >
+            <span id="submit-product-text">Add Product</span>
+            <div id="submit-product-loading" class="hidden">
+              <div
+                class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"
+              ></div>
+            </div>
+          </button>
+        </div>
       </div>
     </div>
 
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1000.0.min.js"></script>
     <script src="config.js"></script>
+    <script src="api-client.js"></script>
     <script src="auth.js"></script>
     <script src="auth-guard.js"></script>
-    <script src="api-client.js"></script>
+    <script src="nav-role-handler.js"></script>
     <script src="products.js"></script>
     <script>
-      // Handle authentication UI and logout
-      document.addEventListener('DOMContentLoaded', function() {
-        const logoutBtn = document.getElementById('logout-btn');
-        const authButtons = document.getElementById('auth-buttons');
-        const userInfo = document.getElementById('user-info');
-        const userMenuBtn = document.getElementById('user-menu-btn');
-        const userDropdown = document.getElementById('user-dropdown');
-        const userAvatar = document.getElementById('user-avatar');
-        const userName = document.getElementById('user-name');
-        const dropdownName = document.getElementById('dropdown-name');
-        const dropdownEmail = document.getElementById('dropdown-email');
+      document.addEventListener("DOMContentLoaded", function () {
+        const logoutBtn = document.getElementById("logout-btn");
+        const authButtons = document.getElementById("auth-buttons");
+        const userInfo = document.getElementById("user-info");
+        const userMenuBtn = document.getElementById("user-menu-btn");
+        const userDropdown = document.getElementById("user-dropdown");
+        const userAvatar = document.getElementById("user-avatar");
+        const userEmail = document.getElementById("user-email");
+        const userRole = document.getElementById("user-role");
 
         function updateAuthUI() {
           if (window.cognitoAuth && window.cognitoAuth.isLoggedIn()) {
-            // User is logged in
-            authButtons.classList.add('hidden');
-            userInfo.classList.remove('hidden');
-            const user = window.cognitoAuth.getUser();
-            if (user) {
-              const userEmail = user.email || localStorage.getItem("user_email");
-              const name = userEmail || "User";
-              const initial = name.charAt(0).toUpperCase();
-              
-              userAvatar.textContent = initial;
-              userName.textContent = name.split('@')[0]; // Show name or first part of email
-              dropdownName.textContent = name;
-              dropdownEmail.textContent = user.email;
+            authButtons.classList.add("hidden");
+            userInfo.classList.remove("hidden");
+
+            const email =
+              localStorage.getItem("user_email") || "user@example.com";
+            const role = localStorage.getItem("user_role");
+            const initial = email.charAt(0).toUpperCase();
+
+            if (userAvatar) userAvatar.textContent = initial;
+            if (userEmail) userEmail.textContent = email;
+            if (userRole) {
+              const roleText =
+                role === "client"
+                  ? "Client"
+                  : role === "company"
+                  ? "Company"
+                  : "User";
+              userRole.textContent = `Role: ${roleText}`;
             }
           } else {
-            // User is not logged in
-            authButtons.classList.remove('hidden');
-            userInfo.classList.add('hidden');
+            authButtons.classList.remove("hidden");
+            userInfo.classList.add("hidden");
           }
         }
-
-        // Toggle dropdown
         if (userMenuBtn) {
-          userMenuBtn.addEventListener('click', (e) => {
+          userMenuBtn.addEventListener("click", (e) => {
             e.stopPropagation();
-            userDropdown.classList.toggle('hidden');
+            userDropdown.classList.toggle("hidden");
           });
         }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-          if (userDropdown && !userDropdown.classList.contains('hidden')) {
-            userDropdown.classList.add('hidden');
+        document.addEventListener("click", (e) => {
+          if (userDropdown && !userDropdown.classList.contains("hidden")) {
+            userDropdown.classList.add("hidden");
           }
         });
-
-        // Prevent dropdown from closing when clicking inside it
         if (userDropdown) {
-          userDropdown.addEventListener('click', (e) => {
+          userDropdown.addEventListener("click", (e) => {
             e.stopPropagation();
           });
         }
-
-        // Logout handler
         if (logoutBtn) {
-          logoutBtn.addEventListener('click', () => {
+          logoutBtn.addEventListener("click", () => {
             if (window.cognitoAuth) {
               window.cognitoAuth.logout();
             }
           });
         }
-
-        // Update UI when page loads
         updateAuthUI();
       });
     </script>

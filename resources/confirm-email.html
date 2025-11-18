@@ -1,13 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Confirm Email - Grupi</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1000.0.min.js"></script>
-    <script src="config.js"></script>
-    <script src="auth.js"></script>
   </head>
   <body class="bg-gray-50 min-h-screen flex items-center justify-center">
     <div class="max-w-md w-full space-y-8">
@@ -15,31 +12,31 @@
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Confirm Email
         </h2>
-         <p class="mt-2 text-center text-sm text-gray-600">
-           Enter the verification code we sent to your email
-         </p>
-         <p class="mt-1 text-center text-sm text-gray-600">
-           <a
-             href="login.html"
-             class="font-medium text-purple-600 hover:text-purple-500"
-             >← Back to login</a
-           >
-         </p>
+        <p class="mt-2 text-center text-sm text-gray-600">
+          Enter the verification code we sent to your email
+        </p>
+        <p class="mt-1 text-center text-sm text-gray-600">
+          <a
+            href="login.html"
+            class="font-medium text-purple-600 hover:text-purple-500"
+            >← Back to login</a
+          >
+        </p>
       </div>
 
       <form class="mt-8 space-y-6" id="confirm-form">
         <div class="rounded-md shadow-sm -space-y-px">
-           <div>
-             <label for="email" class="sr-only">Email</label>
-             <input
-               id="email"
-               name="email"
-               type="email"
-               required
-               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
-               placeholder="Email"
-             />
-           </div>
+          <div>
+            <label for="email" class="sr-only">Email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
+              placeholder="Email"
+            />
+          </div>
           <div>
             <label for="code" class="sr-only">Código de verificación</label>
             <input
@@ -84,26 +81,23 @@
     </div>
 
     <script>
-       document.addEventListener("DOMContentLoaded", function () {
-         // Get email from URL or localStorage
-         const urlParams = new URLSearchParams(window.location.search);
-         const emailFromUrl = urlParams.get("email");
-         const emailFromStorage = localStorage.getItem("pending_email");
+      document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const emailFromUrl = urlParams.get("email");
+        const emailFromStorage = localStorage.getItem("pending_email");
 
-         const email = emailFromUrl || emailFromStorage;
-         const emailInput = document.getElementById("email");
+        const email = emailFromUrl || emailFromStorage;
+        const emailInput = document.getElementById("email");
 
-         if (email) {
-           emailInput.value = email;
-           localStorage.setItem("pending_email", email);
-           // If email comes from URL or localStorage, make the field readonly
-           emailInput.setAttribute('readonly', 'true');
-           emailInput.classList.add('bg-gray-100');
-         } else {
-           // If no email, allow manual entry
-           emailInput.focus();
-         }
-       });
+        if (email) {
+          emailInput.value = email;
+          localStorage.setItem("pending_email", email);
+          emailInput.setAttribute("readonly", "true");
+          emailInput.classList.add("bg-gray-100");
+        } else {
+          emailInput.focus();
+        }
+      });
 
       document
         .getElementById("confirm-form")
@@ -119,26 +113,51 @@
             errorDiv.classList.add("hidden");
             successDiv.classList.add("hidden");
 
-            // Confirm signup with the code
             await window.cognitoAuth.confirmSignup(email, code);
 
-            // Save user email in localStorage
-            localStorage.setItem('user_email', email);
+            await new Promise((resolve) => setTimeout(resolve, 500));
+
+            const role = localStorage.getItem("pending_role");
+
+            if (role && window.apiClient) {
+              try {
+                await window.apiClient.setUserRole(email, role);
+                localStorage.setItem("user_role", role);
+              } catch (roleError) {
+                console.error("Error setting role:", roleError);
+                localStorage.setItem("user_role", role);
+              }
+            } else if (window.apiClient) {
+              try {
+                const roleData = await window.apiClient.getUserRole();
+                if (roleData && roleData.role) {
+                  localStorage.setItem("user_role", roleData.role);
+                }
+              } catch (roleError) {
+                console.error("Error fetching role:", roleError);
+              }
+            } else if (role) {
+              console.warn(
+                "API client not available, saving role to localStorage only"
+              );
+              localStorage.setItem("user_role", role);
+            }
+
+            localStorage.setItem("user_email", email);
 
             successDiv.textContent =
               "Email confirmed successfully. Redirecting...";
             successDiv.classList.remove("hidden");
 
-            // Clear pending email
             localStorage.removeItem("pending_email");
+            localStorage.removeItem("pending_role");
+            localStorage.removeItem("pending_password");
 
-            // Redirect to index after 2 seconds
             setTimeout(() => {
               window.location.href = "index.html";
             }, 2000);
           } catch (error) {
-            errorDiv.textContent =
-              error.message || "Error confirming email";
+            errorDiv.textContent = error.message || "Error confirming email";
             errorDiv.classList.remove("hidden");
           }
         });
@@ -153,18 +172,20 @@
           try {
             errorDiv.classList.add("hidden");
             successDiv.classList.add("hidden");
-
-            // Resend confirmation code
             await window.cognitoAuth.resendConfirmationCode(email);
 
             successDiv.textContent = "Code resent. Check your email.";
             successDiv.classList.remove("hidden");
           } catch (error) {
-            errorDiv.textContent =
-              error.message || "Error resending code";
+            errorDiv.textContent = error.message || "Error resending code";
             errorDiv.classList.remove("hidden");
           }
         });
     </script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1000.0.min.js"></script>
+    <script src="config.js"></script>
+    <script src="api-client.js"></script>
+    <script src="auth.js"></script>
+    <script src="nav-role-handler.js"></script>
   </body>
 </html>

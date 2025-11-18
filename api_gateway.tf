@@ -45,11 +45,11 @@ module "http_api" {
       filename      = "${path.module}/functions/lambda_get_pool_details.zip"
       handler       = "lambda_get_pool_details.handler"
     }
-    get_pool_requests = {
-      route_key     = "GET /pools/{id}/requests"
-      function_name = "get_pool_requests"
-      filename      = "${path.module}/functions/lambda_get_pool_requests.zip"
-      handler       = "lambda_get_pool_requests.handler"
+    get_requests = {
+      route_key     = "GET /requests"
+      function_name = "get_requests"
+      filename      = "${path.module}/functions/lambda_get_requests.zip"
+      handler       = "lambda_get_requests.handler"
     }
     post_pool_requests = {
       route_key     = "POST /pools/{id}/requests"
@@ -69,22 +69,46 @@ module "http_api" {
       filename      = "${path.module}/functions/lambda_delete_product.zip"
       handler       = "lambda_delete_product.handler"
     }
+    get_analytics_pools_sales = {
+      route_key     = "GET /analytics/pools/sales"
+      function_name = "get_analytics_pools_sales"
+      filename      = "${path.module}/functions/lambda_get_analytics_pools_sales.zip"
+      handler       = "lambda_get_analytics_pools_sales.handler"
+    }
+    get_analytics_overview = {
+      route_key     = "GET /analytics/overview"
+      function_name = "get_analytics_overview"
+      filename      = "${path.module}/functions/lambda_get_analytics_overview.zip"
+      handler       = "lambda_get_analytics_overview.handler"
+    }
+    set_user_role = {
+      route_key     = "POST /users/role"
+      function_name = "set_user_role"
+      filename      = "${path.module}/functions/lambda_set_user_role.zip"
+      handler       = "lambda_set_user_role.handler"
+    }
+    get_user_role = {
+      route_key     = "GET /users/role"
+      function_name = "get_user_role"
+      filename      = "${path.module}/functions/lambda_get_user_role.zip"
+      handler       = "lambda_get_user_role.handler"
+    }
   }
 
   role            = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
-  runtime         = local.lambda_runtime
+  runtime         = var.lambda_runtime
   subnet_ids      = module.vpc.private_lambda_subnet_ids
   security_groups = [aws_security_group.lambda.id]
   layers          = [aws_lambda_layer_version.psycopg2.arn]
 
   environment_variables = {
-    DB_HOST     = aws_db_proxy.this.endpoint
-    DB_PORT     = "5432"
-    DB_NAME     = aws_db_instance.this.db_name
-    DB_USER     = var.db_username
-    DB_PASSWORD = var.db_password
+    DB_HOST            = aws_db_proxy.this.endpoint
+    DB_PORT            = "5432"
+    DB_NAME            = aws_db_instance.this.db_name
+    DB_USER            = var.db_username
+    DB_PASSWORD        = var.db_password
     IMAGES_BUCKET_NAME = aws_s3_bucket.images_bucket.bucket
-    SNS_TOPIC_ARN = aws_sns_topic.pool_notifications.arn
+    SNS_TOPIC_ARN      = aws_sns_topic.pool_notifications.arn
   }
 
   depends_on = [aws_db_proxy_target.this, aws_lambda_layer_version.psycopg2]

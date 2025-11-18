@@ -46,3 +46,4 @@ python/
 lambda_init_response.json
 /functions/*.zip
 *.zip
+lambda_destroyer_response.json

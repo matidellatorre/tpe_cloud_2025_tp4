@@ -70,12 +70,25 @@ def create_tables(conn):
     );
     """
 
+    user_role_table = """
+    CREATE TABLE IF NOT EXISTS user_role (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(254) NOT NULL UNIQUE,
+        cognito_sub VARCHAR(255) UNIQUE,
+        role VARCHAR(50) NOT NULL CHECK (role IN ('client', 'company')),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+    """
+
     indexes = [
         "CREATE INDEX IF NOT EXISTS idx_pools_product_id ON pool(product_id);",
         "CREATE INDEX IF NOT EXISTS idx_pools_status ON pool(status);",
         "CREATE INDEX IF NOT EXISTS idx_requests_pool_id ON request(pool_id);",
         "CREATE INDEX IF NOT EXISTS idx_requests_email ON request(email);",
         "CREATE INDEX IF NOT EXISTS idx_products_category ON product(category);",
+        "CREATE INDEX IF NOT EXISTS idx_user_role_email ON user_role(email);",
+        "CREATE INDEX IF NOT EXISTS idx_user_role_sub ON user_role(cognito_sub);",
     ]
 
     update_trigger = """
@@ -98,7 +111,7 @@ def create_tables(conn):
         FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
     """
 
-    tables = [products_table, pools_table, requests_table]
+    tables = [products_table, pools_table, requests_table, user_role_table]
 
     try:
         with conn.cursor() as cur:
@@ -141,7 +154,7 @@ def handler(event, context):
                 "body": json.dumps(
                     {
                         "message": "Database initialized successfully",
-                        "tables_created": ["product", "pool", "request"],
+                        "tables_created": ["product", "pool", "request", "user_role"],
                     }
                 ),
             }

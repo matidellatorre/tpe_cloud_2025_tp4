@@ -1,14 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Grupi</title>
     <link rel="stylesheet" href="style.css" />
-    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1000.0.min.js"></script>
-    <script src="config.js"></script>
-    <script src="auth.js"></script>
-    <script src="api-client.js"></script>
   </head>
   <body class="bg-gray-50">
     <nav
@@ -52,6 +48,11 @@
               class="nav-link text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
               >Requests</a
             >
+            <a
+              href="analytics.html"
+              class="nav-link text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+              >Analytics</a
+            >
 
             <!-- Auth buttons (when not logged in) -->
             <div id="auth-buttons" class="flex items-center space-x-2 ml-4">
@@ -76,14 +77,30 @@
               >
                 <div
                   id="user-avatar"
-                  class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white font-bold text-sm"
+                  class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white font-bold text-base"
                 ></div>
-                <span id="user-name" class="text-sm font-medium text-gray-700"></span>
-                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                <div class="flex flex-col">
+                  <span
+                    id="user-email"
+                    class="text-sm font-medium text-gray-900"
+                  ></span>
+                  <span id="user-role" class="text-xs text-gray-500"></span>
+                </div>
+                <svg
+                  class="w-4 h-4 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  ></path>
                 </svg>
               </button>
-              
+
               <!-- Dropdown menu -->
               <div
                 id="user-dropdown"
@@ -150,6 +167,11 @@
             class="text-gray-700 hover:text-purple-600 hover:bg-purple-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors"
             >Requests</a
           >
+          <a
+            href="analytics.html"
+            class="text-gray-700 hover:text-purple-600 hover:bg-purple-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors"
+            >Analytics</a
+          >
         </div>
       </div>
     </nav>
@@ -176,7 +198,8 @@
           <div class="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
             <div class="rounded-md shadow">
               <a
-                href="pools.html"
+                href="#"
+                id="view-pools-btn"
                 class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 md:py-4 md:text-lg md:px-10 transition-colors"
               >
                 View Pools
@@ -184,7 +207,8 @@
             </div>
             <div class="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
               <a
-                href="products.html"
+                href="#"
+                id="browse-products-btn"
                 class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-purple-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10 transition-colors"
               >
                 Browse Products
@@ -295,96 +319,112 @@
       </div>
     </main>
 
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1000.0.min.js"></script>
     <script src="config.js"></script>
-    <script src="auth.js"></script>
     <script src="api-client.js"></script>
+    <script src="auth.js"></script>
+    <script src="nav-role-handler.js"></script>
     <script src="script.js"></script>
     <script>
-      // Handle authentication UI and logout
-      document.addEventListener('DOMContentLoaded', function() {
-        const logoutBtn = document.getElementById('logout-btn');
-        const authButtons = document.getElementById('auth-buttons');
-        const userInfo = document.getElementById('user-info');
-        const userMenuBtn = document.getElementById('user-menu-btn');
-        const userDropdown = document.getElementById('user-dropdown');
-        const userAvatar = document.getElementById('user-avatar');
-        const userName = document.getElementById('user-name');
-        const dropdownName = document.getElementById('dropdown-name');
-        const dropdownEmail = document.getElementById('dropdown-email');
+      document.addEventListener("DOMContentLoaded", function () {
+        const logoutBtn = document.getElementById("logout-btn");
+        const authButtons = document.getElementById("auth-buttons");
+        const userInfo = document.getElementById("user-info");
+        const userMenuBtn = document.getElementById("user-menu-btn");
+        const userDropdown = document.getElementById("user-dropdown");
+        const userAvatar = document.getElementById("user-avatar");
+        const userEmail = document.getElementById("user-email");
+        const userRole = document.getElementById("user-role");
 
         function updateAuthUI() {
-          console.log('Updating auth UI on landing page...');
-          
           if (window.cognitoAuth && window.cognitoAuth.isLoggedIn()) {
-            // User is logged in
-            console.log('User is logged in');
-            authButtons.classList.add('hidden');
-            userInfo.classList.remove('hidden');
-            
-            const user = window.cognitoAuth.getUser();
-            console.log('User object:', user);
-            
-            if (user) {
-              const userEmail = user.email || localStorage.getItem("user_email");
-              const name = userEmail || 'User';
-              const initial = name.charAt(0).toUpperCase();
-              
-              console.log('Setting avatar initial:', initial);
-              console.log('Setting user name:', name.split('@')[0]);
-              
-              if (userAvatar) userAvatar.textContent = initial;
-              if (userName) userName.textContent = name.split('@')[0];
-              if (dropdownName) dropdownName.textContent = name;
-              if (dropdownEmail) dropdownEmail.textContent = userEmail || '';
-            } else {
-              console.log('User object is null or undefined');
+            authButtons.classList.add("hidden");
+            userInfo.classList.remove("hidden");
+
+            const email =
+              localStorage.getItem("user_email") || "user@example.com";
+            const role = localStorage.getItem("user_role");
+            const initial = email.charAt(0).toUpperCase();
+
+            if (userAvatar) userAvatar.textContent = initial;
+            if (userEmail) userEmail.textContent = email;
+            if (userRole) {
+              const roleText =
+                role === "client"
+                  ? "Client"
+                  : role === "company"
+                  ? "Company"
+                  : "User";
+              userRole.textContent = `Role: ${roleText}`;
             }
           } else {
-            // User is not logged in
-            console.log('User is not logged in');
-            authButtons.classList.remove('hidden');
-            userInfo.classList.add('hidden');
+            authButtons.classList.remove("hidden");
+            userInfo.classList.add("hidden");
           }
         }
-
-        // Toggle dropdown
         if (userMenuBtn) {
-          userMenuBtn.addEventListener('click', (e) => {
+          userMenuBtn.addEventListener("click", (e) => {
             e.stopPropagation();
-            userDropdown.classList.toggle('hidden');
+            userDropdown.classList.toggle("hidden");
           });
         }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-          if (userDropdown && !userDropdown.classList.contains('hidden')) {
-            userDropdown.classList.add('hidden');
+        document.addEventListener("click", (e) => {
+          if (userDropdown && !userDropdown.classList.contains("hidden")) {
+            userDropdown.classList.add("hidden");
           }
         });
-
-        // Prevent dropdown from closing when clicking inside it
         if (userDropdown) {
-          userDropdown.addEventListener('click', (e) => {
+          userDropdown.addEventListener("click", (e) => {
             e.stopPropagation();
           });
         }
-
-        // Logout handler
         if (logoutBtn) {
-          logoutBtn.addEventListener('click', () => {
+          logoutBtn.addEventListener("click", () => {
             if (window.cognitoAuth) {
               window.cognitoAuth.logout();
             }
           });
         }
-
-        // Update UI when page loads
         updateAuthUI();
-
-        // Check auth every 5 seconds
         setInterval(updateAuthUI, 5000);
 
+        // Handle View Pools and Browse Products buttons
+        const viewPoolsBtn = document.getElementById("view-pools-btn");
+        const browseProductsBtn = document.getElementById(
+          "browse-products-btn"
+        );
 
+        if (viewPoolsBtn) {
+          viewPoolsBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            const accessToken = localStorage.getItem("cognito_access_token");
+            if (!accessToken) {
+              localStorage.setItem(
+                "redirect_after_login",
+                window.location.origin + "/pools.html"
+              );
+              window.location.href = "login.html";
+            } else {
+              window.location.href = "pools.html";
+            }
+          });
+        }
+
+        if (browseProductsBtn) {
+          browseProductsBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            const accessToken = localStorage.getItem("cognito_access_token");
+            if (!accessToken) {
+              localStorage.setItem(
+                "redirect_after_login",
+                window.location.origin + "/products.html"
+              );
+              window.location.href = "login.html";
+            } else {
+              window.location.href = "products.html";
+            }
+          });
+        }
       });
     </script>
   </body>

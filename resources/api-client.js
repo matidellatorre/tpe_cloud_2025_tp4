@@ -1,42 +1,47 @@
-// API Configuration - Este archivo será generado por Terraform
-// Si lo ejecutas localmente, usa esta configuración de desarrollo
-
-if (typeof window.API_CONFIG === 'undefined') {
-    window.API_CONFIG = {
-        // Configuración por defecto para desarrollo local
-        // Terraform sobreescribirá esto con la URL real del API Gateway
-        apiUrl: 'http://localhost:3000', // Cambia esto si tienes un backend local
-        region: 'us-east-1'
-    };
+if (typeof window.API_CONFIG === "undefined") {
+  window.API_CONFIG = {
+    apiUrl: "http://localhost:3000",
+    region: "us-east-1",
+  };
 }
 
-// Helper function para hacer llamadas al API
 class ApiClient {
-    constructor() {
-        // El apiUrl de Terraform ya incluye la URL base, pero necesitamos agregar el stage
-        this.baseUrl = window.API_CONFIG.apiUrl + '/prod';
+  constructor() {
+    this.baseUrl = window.API_CONFIG.apiUrl + "/prod";
+  }
+
+  async request(endpoint, options = {}) {
+    const url = `${this.baseUrl}${endpoint}`;
+
+    const accessToken = localStorage.getItem("cognito_access_token");
+
+    const defaultOptions = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    if (accessToken) {
+      defaultOptions.headers["Authorization"] = `Bearer ${accessToken}`;
     }
 
-    async request(endpoint, options = {}) {
-        const url = `${this.baseUrl}${endpoint}`;
+    const config = { ...defaultOptions, ...options };
 
-        // Obtener token de autenticación
-        const accessToken = window.cognitoAuth ? window.cognitoAuth.getAccessToken() : null;
+    try {
+      const response = await fetch(url, config);
 
+      if (response.status === 401) {
+        const currentPage = window.location.pathname.split("/").pop();
+        const publicPages = ["index.html", "login.html", "signup.html", "confirm-email.html", "callback.html", "/", ""];
 
-        const defaultOptions = {
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        };
-
-        // Agregar token de autorización si está disponible
-        if (accessToken) {
-            defaultOptions.headers['Authorization'] = `Bearer ${accessToken}`;
+        if (!publicPages.includes(currentPage)) {
+          localStorage.setItem("redirect_after_login", window.location.href);
+          window.location.href = "login.html";
         }
+        return;
+      }
 
-        const config = { ...defaultOptions, ...options };
-
+      if (!response.ok) {
+        let errorText;
         try {
             const response = await fetch(url, config);
 
@@ -63,103 +68,130 @@ class ApiClient {
         } catch (error) {
             throw error;
         }
+        const error = new Error(
+          `HTTP error! status: ${response.status} - ${errorText}`
+        );
+        error.status = response.status;
+        error.responseText = errorText;
+        throw error;
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async getProducts() {
+    return this.request("/products");
+  }
+
+  async getProduct(productId) {
+    return this.request(`/products/${productId}`);
+  }
+
+  async createProduct(productData) {
+    return this.request("/products", {
+      method: "POST",
+      body: JSON.stringify(productData),
+    });
+  }
+
+  async deleteProduct(productId) {
+    return this.request(`/products/${productId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async getPools() {
+    return this.request("/pools");
+  }
+
+  async getPoolDetails(poolId) {
+    return this.request(`/pools/${poolId}`);
+  }
+
+  async createPool(poolData) {
+    return this.request("/pools", {
+      method: "POST",
+      body: JSON.stringify(poolData),
+    });
+  }
+  async getRequests(params = {}) {
+    const { email, pool_id } = params;
+
+    if (!email && !pool_id) {
+      throw new Error("Either email or pool_id is required to get requests");
     }
 
-    // Productos
-    async getProducts() {
-        return this.request('/products');
-    }
+    const queryParams = new URLSearchParams();
+    if (email) queryParams.append('email', email);
+    if (pool_id) queryParams.append('pool_id', pool_id);
 
-    async getProduct(productId) {
-        return this.request(`/products/${productId}`);
-    }
+    return this.request(`/requests?${queryParams.toString()}`);
+  }
 
-    async createProduct(productData) {
-        return this.request('/products', {
-            method: 'POST',
-            body: JSON.stringify(productData)
-        });
-    }
-
-    async deleteProduct(productId) {
-        return this.request(`/products/${productId}`, {
-            method: 'DELETE'
-        });
-    }
-
-    // Pools
-    async getPools() {
-        return this.request('/pools');
-    }
-
-    async getPoolDetails(poolId) {
-        return this.request(`/pools/${poolId}`);
-    }
-
-    async createPool(poolData) {
-        return this.request('/pools', {
-            method: 'POST',
-            body: JSON.stringify(poolData)
-        });
-    }
-
-    // Pool Requests
-    async getPoolRequests(poolId = null) {
-        if (!poolId) {
-            throw new Error('poolId is required to get pool requests');
-        }
-        return this.request(`/pools/${poolId}/requests`);
-    }
-
-    async createPoolRequest(poolId, requestData) {
-        return this.request(`/pools/${poolId}/requests`, {
-            method: 'POST',
-            body: JSON.stringify(requestData)
-        });
-    }
+  async createPoolRequest(poolId, requestData) {
+    return this.request(`/pools/${poolId}/requests`, {
+      method: "POST",
+      body: JSON.stringify(requestData),
+    });
+  }
 
   async getPresignedUrl() {
-    return this.request('/images/presigned-url', {
-      method: 'POST',
+    return this.request("/images/presigned-url", {
+      method: "POST",
     });
   }
 
   async uploadFile(file) {
     try {
-      // 1. Get the pre-signed URL from our backend
       const { uploadURL, objectKey } = await this.getPresignedUrl();
       if (!uploadURL) {
-        throw new Error('Failed to get a pre-signed URL.');
+        throw new Error("Failed to get a pre-signed URL.");
       }
-
-      // 2. Upload the file directly to S3 using the pre-signed URL
       const uploadResponse = await fetch(uploadURL, {
-        method: 'PUT',
+        method: "PUT",
         body: file,
         headers: {
-          'Content-Type': file.type,
+          "Content-Type": file.type,
         },
       });
 
       if (!uploadResponse.ok) {
-        throw new Error('S3 upload failed.');
+        throw new Error("S3 upload failed.");
       }
-
-      // 3. The public URL is the bucket URL + the object key.
-      const bucketUrl = uploadURL.split('?')[0].split('/').slice(0, -2).join('/');
+      const bucketUrl = uploadURL
+        .split("?")[0]
+        .split("/")
+        .slice(0, -2)
+        .join("/");
       const publicUrl = `${bucketUrl}/${objectKey}`;
-      
-      console.log('File uploaded successfully:', publicUrl);
-      return publicUrl;
 
+      return publicUrl;
     } catch (error) {
-      console.error('Upload process failed:', error);
-      throw error; // Re-throw the error to be caught by the caller
+      console.error("Upload process failed:", error);
+      throw error;
     }
+  }
+  async getAnalyticsOverview() {
+    return this.request("/analytics/overview");
+  }
+
+  async getAnalyticsPoolsSales() {
+    return this.request("/analytics/pools/sales");
+  }
+
+  async setUserRole(email, role) {
+    return this.request("/users/role", {
+      method: "POST",
+      body: JSON.stringify({ email, role }),
+    });
+  }
+
+  async getUserRole() {
+    return this.request("/users/role");
   }
 }
 
-// Crear instancia global del cliente API
 window.apiClient = new ApiClient();
-
-
