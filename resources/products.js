@@ -103,13 +103,11 @@ async function initializeProducts() {
 
       try {
         if (imageFile) {
-          console.log("Uploading file...");
           imageUrl = await window.apiClient.uploadFile(imageFile);
           if (!imageUrl) {
             showNotification("Image upload failed. Please try again.", "error");
             return;
           }
-          console.log("File uploaded. Image URL:", imageUrl);
         }
 
         const productData = {

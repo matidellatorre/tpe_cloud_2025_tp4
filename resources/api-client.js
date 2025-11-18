@@ -30,8 +30,6 @@ class ApiClient {
     try {
       const response = await fetch(url, config);
 
-      console.log("Response status:", response.status);
-
       if (response.status === 401) {
         localStorage.setItem("redirect_after_login", window.location.href);
         window.location.href = "login.html";
@@ -123,7 +121,6 @@ class ApiClient {
         .join("/");
       const publicUrl = `${bucketUrl}/${objectKey}`;
 
-      console.log("File uploaded successfully:", publicUrl);
       return publicUrl;
     } catch (error) {
       console.error("Upload process failed:", error);
@@ -144,14 +141,14 @@ class ApiClient {
 
   // User Roles
   async setUserRole(email, role) {
-    return this.request('/users/role', {
-      method: 'POST',
-      body: JSON.stringify({ email, role })
+    return this.request("/users/role", {
+      method: "POST",
+      body: JSON.stringify({ email, role }),
     });
   }
 
   async getUserRole() {
-    return this.request('/users/role');
+    return this.request("/users/role");
   }
 }
 window.apiClient = new ApiClient();

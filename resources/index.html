@@ -335,32 +335,22 @@
         const dropdownEmail = document.getElementById("dropdown-email");
 
         function updateAuthUI() {
-          console.log("Updating auth UI on landing page...");
-
           if (window.cognitoAuth && window.cognitoAuth.isLoggedIn()) {
-            console.log("User is logged in");
             authButtons.classList.add("hidden");
             userInfo.classList.remove("hidden");
 
             const user = window.cognitoAuth.getUser();
-            console.log("User object:", user);
 
             if (user) {
               const name = user.name || user.email || "User";
               const initial = name.charAt(0).toUpperCase();
 
-              console.log("Setting avatar initial:", initial);
-              console.log("Setting user name:", name.split("@")[0]);
-
               if (userAvatar) userAvatar.textContent = initial;
               if (userName) userName.textContent = name.split("@")[0];
               if (dropdownName) dropdownName.textContent = name;
               if (dropdownEmail) dropdownEmail.textContent = user.email || "";
-            } else {
-              console.log("User object is null or undefined");
             }
           } else {
-            console.log("User is not logged in");
             authButtons.classList.remove("hidden");
             userInfo.classList.add("hidden");
           }

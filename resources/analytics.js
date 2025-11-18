@@ -264,13 +264,9 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-function showLoading() {
-  console.log("Loading analytics data...");
-}
+function showLoading() {}
 
-function hideLoading() {
-  console.log("Analytics data loaded");
-}
+function hideLoading() {}
 
 function showError(message) {
   alert(message);

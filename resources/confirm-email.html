@@ -124,7 +124,6 @@
             if (role) {
               try {
                 await window.apiClient.setUserRole(email, role);
-                console.log("Role set successfully:", role);
               } catch (roleError) {
                 console.error("Error setting role:", roleError);
               }
