@@ -81,8 +81,13 @@ function displayPoolDetails() {
     `${joined}/${currentPool.min_quantity} participants`;
 
   const joinBtn = document.getElementById("join-pool-btn");
-  if (currentPool.status !== "open" || daysRemaining < 0) {
-    joinBtn.textContent = statusInfo.text;
+  const userRole = localStorage.getItem("user_role");
+  const canJoinPool = userRole === "client";
+
+  if (currentPool.status !== "open" || daysRemaining < 0 || !canJoinPool) {
+    joinBtn.textContent = canJoinPool
+      ? statusInfo.text
+      : "Only clients can join";
     joinBtn.disabled = true;
     joinBtn.className =
       "bg-gray-300 text-gray-500 px-6 py-3 rounded-lg font-medium cursor-not-allowed";

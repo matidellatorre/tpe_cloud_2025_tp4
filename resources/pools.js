@@ -286,7 +286,6 @@ function createPoolCard(pool) {
                         )}</span>
                         <span class="text-sm text-gray-500 ml-2">per unit</span>
                     </div>
-                    <span class="text-green-600 font-bold text-lg">Bulk Order</span>
                 </div>
                 <p class="text-xs text-gray-600">Minimum quantity: ${capacity} units</p>
             </div>
@@ -305,15 +304,14 @@ function createPoolCard(pool) {
 
             <div class="flex space-x-2">
                 ${
-                  pool.status === "open" && daysRemaining >= 0
+                  pool.status !== "open" || daysRemaining < 0 || !canJoinPool
                     ? `
-                    <button ${canJoinPool ? 'onclick="joinPool(${pool.id})"' : 'disabled'} class="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-md">
-                        Join Pool
-                    </button>
-                `
+                    <button disabled class="flex-1 bg-gray-300 text-gray-500 px-6 py-3 rounded-lg font-medium cursor-not-allowed">
+                        ${canJoinPool ? statusInfo.text : "Only clients can join"}
+                    </button>`
                     : `
-                    <button disabled class="flex-1 bg-gray-300 text-gray-500 px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed">
-                        ${statusInfo.text}
+                    <button onclick="joinPool(${pool.id})" class="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-md">
+                        Join Pool
                     </button>
                 `
                 }
