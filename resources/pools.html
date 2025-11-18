@@ -397,8 +397,6 @@
         const userDropdown = document.getElementById('user-dropdown');
         const userAvatar = document.getElementById('user-avatar');
         const userName = document.getElementById('user-name');
-        const dropdownName = document.getElementById('dropdown-name');
-        const dropdownEmail = document.getElementById('dropdown-email');
 
         function updateAuthUI() {
           if (window.cognitoAuth && window.cognitoAuth.isLoggedIn()) {
@@ -407,13 +405,12 @@
             userInfo.classList.remove('hidden');
             const user = window.cognitoAuth.getUser();
             if (user) {
-              const name = user.name || user.email;
+              const userEmail = user.email || localStorage.getItem("user_email");
+              const name = userEmail || "User";
               const initial = name.charAt(0).toUpperCase();
               
               userAvatar.textContent = initial;
               userName.textContent = name.split('@')[0];
-              dropdownName.textContent = name;
-              dropdownEmail.textContent = user.email;
             }
           } else {
             // User is not logged in

@@ -325,7 +325,8 @@
             console.log('User object:', user);
             
             if (user) {
-              const name = user.name || user.email || 'User';
+              const userEmail = user.email || localStorage.getItem("user_email");
+              const name = userEmail || 'User';
               const initial = name.charAt(0).toUpperCase();
               
               console.log('Setting avatar initial:', initial);
@@ -334,7 +335,7 @@
               if (userAvatar) userAvatar.textContent = initial;
               if (userName) userName.textContent = name.split('@')[0];
               if (dropdownName) dropdownName.textContent = name;
-              if (dropdownEmail) dropdownEmail.textContent = user.email || '';
+              if (dropdownEmail) dropdownEmail.textContent = userEmail || '';
             } else {
               console.log('User object is null or undefined');
             }

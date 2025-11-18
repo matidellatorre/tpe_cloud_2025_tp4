@@ -385,7 +385,8 @@
             userInfo.classList.remove('hidden');
             const user = window.cognitoAuth.getUser();
             if (user) {
-              const name = user.name || user.email;
+              const userEmail = user.email || localStorage.getItem("user_email");
+              const name = userEmail || "User";
               const initial = name.charAt(0).toUpperCase();
               
               userAvatar.textContent = initial;
