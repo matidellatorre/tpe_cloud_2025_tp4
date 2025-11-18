@@ -139,7 +139,6 @@ class ApiClient {
     return this.request("/analytics/customers/savings");
   }
 
-  // User Roles
   async setUserRole(email, role) {
     return this.request("/users/role", {
       method: "POST",
@@ -151,4 +150,5 @@ class ApiClient {
     return this.request("/users/role");
   }
 }
+
 window.apiClient = new ApiClient();
