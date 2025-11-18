@@ -11,7 +11,7 @@ resource "aws_lambda_function" "lambda_check_pools" {
   function_name    = "check_pools"
   handler          = "lambda_check_pools.handler"
   role             = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole" # Usa el mismo LabRole [cite: 3]
-  runtime          = local.lambda_runtime
+  runtime          = var.lambda_runtime
   timeout          = 60
   source_code_hash = archive_file.lambda_check_pools_zip.output_base64sha256
 

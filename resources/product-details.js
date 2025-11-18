@@ -79,19 +79,13 @@ function displayRelatedPools() {
 }
 
 function createPoolCard(pool) {
-    const today = new Date();
-    const deadline = new Date(pool.end_at);
-    const daysRemaining = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
-    const isExpired = daysRemaining < 0;
-    const status = pool.status;
-  // Get user role to conditionally show Join Pool button
-  const userRole = localStorage.getItem("user_role");
-  const canJoinPool = userRole === "client";
-
   const today = new Date();
   const deadline = new Date(pool.end_at);
   const daysRemaining = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
   const isExpired = daysRemaining < 0;
+  const status = pool.status;
+  const userRole = localStorage.getItem("user_role");
+  const canJoinPool = userRole === "client";
 
   return `
         <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-6 border border-gray-200">

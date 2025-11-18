@@ -85,7 +85,6 @@ function displayPoolDetails() {
       joinBtn.textContent = statusInfo.text;
       joinBtn.disabled = true;
       joinBtn.className = 'bg-gray-300 text-gray-500 px-6 py-3 rounded-lg font-medium cursor-not-allowed';
-    }
   } else if (joined >= currentPool.min_quantity) {
     if (joinBtn) {
       joinBtn.textContent = "Pool Complete";
