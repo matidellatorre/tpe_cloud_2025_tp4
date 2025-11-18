@@ -63,6 +63,12 @@ module "http_api" {
       filename      = "${path.module}/functions/lambda_get_presigned_url.zip"
       handler       = "lambda_get_presigned_url.handler"
     }
+    delete_product = {
+      route_key     = "DELETE /products/{id}"
+      function_name = "delete_product"
+      filename      = "${path.module}/functions/lambda_delete_product.zip"
+      handler       = "lambda_delete_product.handler"
+    }
   }
 
   role            = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"

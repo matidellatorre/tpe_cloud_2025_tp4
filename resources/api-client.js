@@ -49,8 +49,13 @@ class ApiClient {
             }
 
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+                const errorBody = await response.text();
+                try {
+                    const errorJson = JSON.parse(errorBody);
+                    throw new Error(errorJson.error || errorJson.message || errorBody);
+                } catch (e) {
+                    throw new Error(errorBody || `HTTP error! status: ${response.status}`);
+                }
             }
 
             const data = await response.json();
@@ -73,6 +78,12 @@ class ApiClient {
         return this.request('/products', {
             method: 'POST',
             body: JSON.stringify(productData)
+        });
+    }
+
+    async deleteProduct(productId) {
+        return this.request(`/products/${productId}`, {
+            method: 'DELETE'
         });
     }
 
