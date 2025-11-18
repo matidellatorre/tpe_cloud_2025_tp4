@@ -46,6 +46,7 @@ def handler(event, context):
                     p.min_quantity,
                     p.created_at,
                     p.updated_at,
+                    p.status,
                     COALESCE(SUM(r.quantity), 0) as joined
                 FROM pool p
                 LEFT JOIN request r ON p.id = r.pool_id
@@ -63,7 +64,8 @@ def handler(event, context):
                     "min_quantity": row[4],
                     "created_at": row[5].isoformat(),
                     "updated_at": row[6].isoformat(),
-                    "joined": int(row[7]),
+                    "status": row[7],
+                    "joined": int(row[8]),
                 }
                 for row in pools
             ]

@@ -13,6 +13,19 @@ document.addEventListener('DOMContentLoaded', function() {
     loadPoolDetails();
 });
 
+function getStatusInfo(status) {
+  switch (status) {
+    case 'open':
+      return { text: 'Active', classes: 'bg-green-100 text-green-800' };
+    case 'success':
+      return { text: 'Completed', classes: 'bg-blue-100 text-blue-800' };
+    case 'failed':
+      return { text: 'Closed', classes: 'bg-red-100 text-red-800' };
+    default:
+      return { text: status, classes: 'bg-gray-100 text-gray-800' };
+  }
+}
+
 let currentPool = null;
 let poolProduct = null;
 let poolRequests = [];
@@ -57,19 +70,12 @@ function displayPoolDetails() {
     const today = new Date();
     const deadline = new Date(currentPool.end_at);
     const daysRemaining = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
-    const isExpired = daysRemaining < 0;
     
+    const statusInfo = getStatusInfo(currentPool.status);
     const statusElement = document.getElementById('pool-status');
-    if (isExpired) {
-        statusElement.textContent = 'Expired';
-        statusElement.className = 'px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800';
-    } else {
-        statusElement.textContent = 'Active';
-        statusElement.className = 'px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800';
-    }
-    
-    document.getElementById('pool-deadline').textContent = isExpired ? 'Expired' : `${daysRemaining} days left`;
-    
+    statusElement.textContent = statusInfo.text;
+    statusElement.className = `px-3 py-1 rounded-full text-sm font-medium ${statusInfo.classes}`;
+        
     // Display pool stats
     const joined = currentPool.joined || 0;
     const remaining = Math.max(0, currentPool.min_quantity - joined);
@@ -86,14 +92,10 @@ function displayPoolDetails() {
     
     // Update join button
     const joinBtn = document.getElementById('join-pool-btn');
-    if (isExpired) {
-        joinBtn.textContent = 'Pool Expired';
+    if (currentPool.status !== 'open' || daysRemaining < 0) {
+        joinBtn.textContent = statusInfo.text;
         joinBtn.disabled = true;
         joinBtn.className = 'bg-gray-300 text-gray-500 px-6 py-3 rounded-lg font-medium cursor-not-allowed';
-    } else if (joined >= currentPool.min_quantity) {
-        joinBtn.textContent = 'Pool Complete';
-        joinBtn.disabled = true;
-        joinBtn.className = 'bg-green-500 text-white px-6 py-3 rounded-lg font-medium cursor-not-allowed';
     }
     
     // Display requests
@@ -147,7 +149,7 @@ function createRequestCard(request) {
 }
 
 async function joinPool() {
-    if (currentPool && !isExpired(currentPool.end_at)) {
+    if (currentPool && currentPool.status === 'open') {
         // Open join pool modal
         openJoinPoolModal(currentPool);
     }
@@ -324,12 +326,6 @@ function closeJoinPoolModal() {
     if (modal) {
         modal.remove();
     }
-}
-
-function isExpired(endDate) {
-    const today = new Date();
-    const deadline = new Date(endDate);
-    return deadline < today;
 }
 
 function formatDate(dateString) {

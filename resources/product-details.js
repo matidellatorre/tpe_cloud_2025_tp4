@@ -81,6 +81,7 @@ function createPoolCard(pool) {
     const deadline = new Date(pool.end_at);
     const daysRemaining = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
     const isExpired = daysRemaining < 0;
+    const status = pool.status;
 
     return `
         <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-6 border border-gray-200">

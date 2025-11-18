@@ -22,6 +22,19 @@ function setupMobileMenu() {
     }
 }
 
+function getStatusInfo(status) {
+  switch (status) {
+    case 'open':
+      return { text: 'Active', classes: 'bg-green-100 text-green-800', color: 'green'};
+    case 'success':
+      return { text: 'Completed', classes: 'bg-blue-100 text-blue-800', color: 'blue' };
+    case 'failed':
+      return { text: 'Closed', classes: 'bg-red-100 text-red-800', color: 'red' };
+    default:
+      return { text: status, classes: 'bg-gray-100 text-gray-800', color: 'gray'};
+  }
+}
+
 // Removed filterRequests UI handler: filtering UI not implemented
 
 function renderRequests() {
@@ -44,18 +57,35 @@ function renderRequests() {
 }
 
 function createRequestCard(request) {
-    // Por ahora, todos los requests están "pending" ya que no tenemos status en la DB
-    const statusConfig = {
-        pending: {
-            color: 'purple',
-            icon: `<svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    const statusInfo = getStatusInfo(request.pool?.status);
+
+    // Calculate days remaining
+    const today = new Date();
+    const deadline = new Date(request.pool?.end_at);
+    const daysRemaining = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+    
+    let statusText = statusInfo.text;
+    if (request.pool?.status === 'open') {
+        if (daysRemaining >= 0) {
+            statusText = `Waiting for pool to complete (${daysRemaining} days left)`;
+        } else {
+            statusText = 'Pool expired before completion';
+        }
+    }
+
+    const icon = {
+        open: `<svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>`,
-            text: 'Waiting for pool to complete'
-        }
+        success: `<svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>`,
+        failed: `<svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>`
     };
-
-    const config = statusConfig.pending;
+    
+    const statusIcon = icon[request.pool?.status] || icon.failed;
 
     return `
         <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-200">
@@ -70,15 +100,15 @@ function createRequestCard(request) {
                                 <p class="text-sm text-gray-600 mt-1">Product: ${request.pool.product.name}</p>
                             ` : ''}
                         </div>
-                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-${config.color}-100 text-${config.color}-800 capitalize ml-2">
-                            pending
+                        <span class="px-3 py-1 rounded-full text-xs font-medium ${statusInfo.classes} capitalize ml-2">
+                            ${statusInfo.text}
                         </span>
                     </div>
 
                     <!-- Status Info -->
-                    <div class="flex items-center space-x-2 mb-4 text-${config.color}-600">
-                        ${config.icon}
-                        <span class="text-sm font-medium">${config.text}</span>
+                    <div class="flex items-center space-x-2 mb-4 text-${statusInfo.color}-600">
+                        ${statusIcon}
+                        <span class="text-sm font-medium">${statusText}</span>
                     </div>
 
                     <!-- Request Details -->
