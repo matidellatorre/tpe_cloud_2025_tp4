@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -95,19 +95,14 @@
             document.getElementById("confirm-password").value;
           const errorDiv = document.getElementById("error-message");
           const successDiv = document.getElementById("success-message");
-
-          // Validate that passwords match
           if (password !== confirmPassword) {
             errorDiv.textContent = "Passwords do not match";
             errorDiv.classList.remove("hidden");
             successDiv.classList.add("hidden");
             return;
           }
-
-          // Validate password length
           if (password.length < 8) {
-            errorDiv.textContent =
-              "Password must be at least 8 characters";
+            errorDiv.textContent = "Password must be at least 8 characters";
             errorDiv.classList.remove("hidden");
             successDiv.classList.add("hidden");
             return;
@@ -116,24 +111,18 @@
           try {
             errorDiv.classList.add("hidden");
             successDiv.classList.add("hidden");
-
-            // Use the signup function from auth.js
             await window.cognitoAuth.signupWithPassword(email, password);
-
-            // Save user email in localStorage
-            localStorage.setItem('user_email', email);
-
-            // Save email and password for use in confirmation
-            localStorage.setItem('pending_email', email);
-            localStorage.setItem('pending_password', password);
+            localStorage.setItem("user_email", email);
+            localStorage.setItem("pending_email", email);
+            localStorage.setItem("pending_password", password);
 
             successDiv.textContent =
               "Account created successfully. Check your email for the verification code.";
             successDiv.classList.remove("hidden");
-
-            // Redirect to confirmation page after 2 seconds
             setTimeout(() => {
-              window.location.href = `confirm-email.html?email=${encodeURIComponent(email)}`;
+              window.location.href = `confirm-email.html?email=${encodeURIComponent(
+                email
+              )}`;
             }, 2000);
           } catch (error) {
             errorDiv.textContent = error.message || "Error creating account";

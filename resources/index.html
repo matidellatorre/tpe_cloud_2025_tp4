@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -83,12 +83,25 @@
                   id="user-avatar"
                   class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white font-bold text-sm"
                 ></div>
-                <span id="user-name" class="text-sm font-medium text-gray-700"></span>
-                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                <span
+                  id="user-name"
+                  class="text-sm font-medium text-gray-700"
+                ></span>
+                <svg
+                  class="w-4 h-4 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  ></path>
                 </svg>
               </button>
-              
+
               <!-- Dropdown menu -->
               <div
                 id="user-dropdown"
@@ -310,90 +323,73 @@
     <script src="api-client.js"></script>
     <script src="script.js"></script>
     <script>
-      // Handle authentication UI and logout
-      document.addEventListener('DOMContentLoaded', function() {
-        const logoutBtn = document.getElementById('logout-btn');
-        const authButtons = document.getElementById('auth-buttons');
-        const userInfo = document.getElementById('user-info');
-        const userMenuBtn = document.getElementById('user-menu-btn');
-        const userDropdown = document.getElementById('user-dropdown');
-        const userAvatar = document.getElementById('user-avatar');
-        const userName = document.getElementById('user-name');
-        const dropdownName = document.getElementById('dropdown-name');
-        const dropdownEmail = document.getElementById('dropdown-email');
+      document.addEventListener("DOMContentLoaded", function () {
+        const logoutBtn = document.getElementById("logout-btn");
+        const authButtons = document.getElementById("auth-buttons");
+        const userInfo = document.getElementById("user-info");
+        const userMenuBtn = document.getElementById("user-menu-btn");
+        const userDropdown = document.getElementById("user-dropdown");
+        const userAvatar = document.getElementById("user-avatar");
+        const userName = document.getElementById("user-name");
+        const dropdownName = document.getElementById("dropdown-name");
+        const dropdownEmail = document.getElementById("dropdown-email");
 
         function updateAuthUI() {
-          console.log('Updating auth UI on landing page...');
-          
+          console.log("Updating auth UI on landing page...");
+
           if (window.cognitoAuth && window.cognitoAuth.isLoggedIn()) {
-            // User is logged in
-            console.log('User is logged in');
-            authButtons.classList.add('hidden');
-            userInfo.classList.remove('hidden');
-            
+            console.log("User is logged in");
+            authButtons.classList.add("hidden");
+            userInfo.classList.remove("hidden");
+
             const user = window.cognitoAuth.getUser();
-            console.log('User object:', user);
-            
+            console.log("User object:", user);
+
             if (user) {
-              const name = user.name || user.email || 'User';
+              const name = user.name || user.email || "User";
               const initial = name.charAt(0).toUpperCase();
-              
-              console.log('Setting avatar initial:', initial);
-              console.log('Setting user name:', name.split('@')[0]);
-              
+
+              console.log("Setting avatar initial:", initial);
+              console.log("Setting user name:", name.split("@")[0]);
+
               if (userAvatar) userAvatar.textContent = initial;
-              if (userName) userName.textContent = name.split('@')[0];
+              if (userName) userName.textContent = name.split("@")[0];
               if (dropdownName) dropdownName.textContent = name;
-              if (dropdownEmail) dropdownEmail.textContent = user.email || '';
+              if (dropdownEmail) dropdownEmail.textContent = user.email || "";
             } else {
-              console.log('User object is null or undefined');
+              console.log("User object is null or undefined");
             }
           } else {
-            // User is not logged in
-            console.log('User is not logged in');
-            authButtons.classList.remove('hidden');
-            userInfo.classList.add('hidden');
+            console.log("User is not logged in");
+            authButtons.classList.remove("hidden");
+            userInfo.classList.add("hidden");
           }
         }
-
-        // Toggle dropdown
         if (userMenuBtn) {
-          userMenuBtn.addEventListener('click', (e) => {
+          userMenuBtn.addEventListener("click", (e) => {
             e.stopPropagation();
-            userDropdown.classList.toggle('hidden');
+            userDropdown.classList.toggle("hidden");
           });
         }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-          if (userDropdown && !userDropdown.classList.contains('hidden')) {
-            userDropdown.classList.add('hidden');
+        document.addEventListener("click", (e) => {
+          if (userDropdown && !userDropdown.classList.contains("hidden")) {
+            userDropdown.classList.add("hidden");
           }
         });
-
-        // Prevent dropdown from closing when clicking inside it
         if (userDropdown) {
-          userDropdown.addEventListener('click', (e) => {
+          userDropdown.addEventListener("click", (e) => {
             e.stopPropagation();
           });
         }
-
-        // Logout handler
         if (logoutBtn) {
-          logoutBtn.addEventListener('click', () => {
+          logoutBtn.addEventListener("click", () => {
             if (window.cognitoAuth) {
               window.cognitoAuth.logout();
             }
           });
         }
-
-        // Update UI when page loads
         updateAuthUI();
-
-        // Check auth every 5 seconds
         setInterval(updateAuthUI, 5000);
-
-
       });
     </script>
   </body>

@@ -1,4 +1,3 @@
-// Mobile menu toggle
 document.addEventListener("DOMContentLoaded", function () {
   const mobileMenuButton = document.getElementById("mobile-menu-button");
   const mobileMenu = document.getElementById("mobile-menu");
@@ -8,12 +7,8 @@ document.addEventListener("DOMContentLoaded", function () {
       mobileMenu.classList.toggle("hidden");
     });
   }
-
-  // Products functionality
   initializeProducts();
 });
-
-// Products data - will be loaded from API
 let productsData = [];
 
 async function initializeProducts() {
@@ -22,11 +17,7 @@ async function initializeProducts() {
   const closeModalBtn = document.getElementById("close-modal-btn");
   const cancelModalBtn = document.getElementById("cancel-modal-btn");
   const addProductForm = document.getElementById("add-product-form");
-
-  // Load products from API
   await loadProducts();
-
-  // Modal controls
   if (addProductBtn) {
     addProductBtn.addEventListener("click", () => {
       modal.classList.remove("hidden");
@@ -54,11 +45,8 @@ async function initializeProducts() {
     modal.classList.add("hidden");
     modal.classList.remove("flex");
     addProductForm.reset();
-    // Reset image preview
     resetImagePreview();
   }
-
-  // Image preview functionality
   const imageInput = document.getElementById("product-image");
   const imagePreviewContainer = document.getElementById(
     "image-preview-container"
@@ -71,14 +59,11 @@ async function initializeProducts() {
     imageInput.addEventListener("change", function (e) {
       const file = e.target.files[0];
       if (file) {
-        // Validate file type
         if (!file.type.match("image/jpeg")) {
           showNotification("Please select a JPEG image", "error");
           imageInput.value = "";
           return;
         }
-
-        // Create preview
         const reader = new FileReader();
         reader.onload = function (e) {
           imagePreview.src = e.target.result;
@@ -102,8 +87,6 @@ async function initializeProducts() {
     if (imagePreviewContainer) imagePreviewContainer.classList.add("hidden");
     if (imageUploadArea) imageUploadArea.classList.remove("hidden");
   }
-
-  // Form submission
   if (addProductForm) {
     addProductForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -111,8 +94,6 @@ async function initializeProducts() {
       const submitBtn = document.getElementById("submit-product-btn");
       const submitText = document.getElementById("submit-product-text");
       const submitLoading = document.getElementById("submit-product-loading");
-
-      // Show loading state
       submitBtn.disabled = true;
       submitText.classList.add("hidden");
       submitLoading.classList.remove("hidden");
@@ -121,14 +102,12 @@ async function initializeProducts() {
       let imageUrl = null;
 
       try {
-        // Step 1: If there's an image, upload it first.
         if (imageFile) {
           console.log("Uploading file...");
           imageUrl = await window.apiClient.uploadFile(imageFile);
           if (!imageUrl) {
-            // The error is already logged in uploadFile, just stop the process
             showNotification("Image upload failed. Please try again.", "error");
-            return; // Stop if upload fails
+            return;
           }
           console.log("File uploaded. Image URL:", imageUrl);
         }
@@ -139,26 +118,23 @@ async function initializeProducts() {
           unit_price: parseFloat(
             document.getElementById("product-price").value
           ),
-          image_url: imageUrl, // Use the URL from the upload
+          image_url: imageUrl,
         };
 
         await window.apiClient.createProduct(productData);
-        await loadProducts(); // Reload products from API
+        await loadProducts();
         closeModal();
         showNotification("Product added successfully!");
       } catch (error) {
         console.error("Error creating product:", error);
         showNotification("Error creating product. Please try again.");
       } finally {
-        // Hide loading state
         submitBtn.disabled = false;
         submitText.classList.remove("hidden");
         submitLoading.classList.add("hidden");
       }
     });
   }
-
-  // Initial render
   renderProducts();
 }
 
@@ -259,13 +235,11 @@ function viewProductDetails(productId) {
 function createPool(productId) {
   const product = productsData.find((p) => p.id === productId);
   if (product) {
-    // Open create pool modal with pre-selected product
     openCreatePoolModal(product);
   }
 }
 
 function openCreatePoolModal(product) {
-  // Create modal HTML
   const modalHTML = `
         <div id="create-pool-modal-from-product" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
             <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-90vh overflow-y-auto">
@@ -335,16 +309,10 @@ function openCreatePoolModal(product) {
             </div>
         </div>
     `;
-
-  // Add modal to body
   document.body.insertAdjacentHTML("beforeend", modalHTML);
-
-  // Set minimum date for deadline to today
   const deadlineInput = document.getElementById("pool-deadline-from-product");
   const today = new Date().toISOString().split("T")[0];
   deadlineInput.setAttribute("min", today);
-
-  // Add event listeners
   setupCreatePoolModalEvents(product);
 }
 
@@ -353,8 +321,6 @@ function setupCreatePoolModalEvents(product) {
   const closeBtn = document.getElementById("close-pool-modal-btn");
   const cancelBtn = document.getElementById("cancel-pool-modal-btn");
   const form = document.getElementById("create-pool-form-from-product");
-
-  // Close modal events
   closeBtn.addEventListener("click", closeCreatePoolModal);
   cancelBtn.addEventListener("click", closeCreatePoolModal);
   modal.addEventListener("click", (e) => {
@@ -362,8 +328,6 @@ function setupCreatePoolModalEvents(product) {
       closeCreatePoolModal();
     }
   });
-
-  // Form submission
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -379,8 +343,6 @@ function setupCreatePoolModalEvents(product) {
     const deadline = document.getElementById(
       "pool-deadline-from-product"
     ).value;
-
-    // Validation
     if (!minQuantity || minQuantity < 2) {
       showNotification("Minimum quantity must be at least 2", "error");
       return;
@@ -390,8 +352,6 @@ function setupCreatePoolModalEvents(product) {
       showNotification("Please select a deadline", "error");
       return;
     }
-
-    // Show loading state
     submitBtn.disabled = true;
     submitText.classList.add("hidden");
     submitLoading.classList.remove("hidden");
@@ -407,12 +367,10 @@ function setupCreatePoolModalEvents(product) {
       await window.apiClient.createPool(poolData);
       closeCreatePoolModal();
       showNotification("Pool created successfully!", "success");
-      // Reload products to show updated data
       await loadProducts();
     } catch (error) {
       showNotification("Error creating pool. Please try again.", "error");
     } finally {
-      // Hide loading state
       submitBtn.disabled = false;
       submitText.classList.remove("hidden");
       submitLoading.classList.add("hidden");

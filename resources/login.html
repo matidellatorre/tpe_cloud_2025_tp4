@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -86,14 +86,8 @@
 
           try {
             errorDiv.classList.add("hidden");
-
-            // Use the login function from auth.js
             await window.cognitoAuth.loginWithPassword(email, password);
-
-            // Save user email in localStorage
-            localStorage.setItem('user_email', email);
-
-            // Redirect to index after successful login
+            localStorage.setItem("user_email", email);
             window.location.href = "index.html";
           } catch (error) {
             errorDiv.textContent = error.message || "Error signing in";

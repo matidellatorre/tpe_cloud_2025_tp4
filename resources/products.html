@@ -450,7 +450,6 @@
     <script src="api-client.js"></script>
     <script src="products.js"></script>
     <script>
-      // Handle authentication UI and logout
       document.addEventListener("DOMContentLoaded", function () {
         const logoutBtn = document.getElementById("logout-btn");
         const authButtons = document.getElementById("auth-buttons");
@@ -464,7 +463,6 @@
 
         function updateAuthUI() {
           if (window.cognitoAuth && window.cognitoAuth.isLoggedIn()) {
-            // User is logged in
             authButtons.classList.add("hidden");
             userInfo.classList.remove("hidden");
             const user = window.cognitoAuth.getUser();
@@ -473,40 +471,31 @@
               const initial = name.charAt(0).toUpperCase();
 
               userAvatar.textContent = initial;
-              userName.textContent = name.split("@")[0]; // Show name or first part of email
+              userName.textContent = name.split("@")[0];
               dropdownName.textContent = name;
               dropdownEmail.textContent = user.email;
             }
           } else {
-            // User is not logged in
             authButtons.classList.remove("hidden");
             userInfo.classList.add("hidden");
           }
         }
-
-        // Toggle dropdown
         if (userMenuBtn) {
           userMenuBtn.addEventListener("click", (e) => {
             e.stopPropagation();
             userDropdown.classList.toggle("hidden");
           });
         }
-
-        // Close dropdown when clicking outside
         document.addEventListener("click", (e) => {
           if (userDropdown && !userDropdown.classList.contains("hidden")) {
             userDropdown.classList.add("hidden");
           }
         });
-
-        // Prevent dropdown from closing when clicking inside it
         if (userDropdown) {
           userDropdown.addEventListener("click", (e) => {
             e.stopPropagation();
           });
         }
-
-        // Logout handler
         if (logoutBtn) {
           logoutBtn.addEventListener("click", () => {
             if (window.cognitoAuth) {
@@ -514,8 +503,6 @@
             }
           });
         }
-
-        // Update UI when page loads
         updateAuthUI();
       });
     </script>

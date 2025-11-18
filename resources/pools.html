@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -46,62 +46,75 @@
             <a
               href="requests.html"
               class="nav-link text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
-             >Requests</a
-             >
+              >Requests</a
+            >
             <a
               href="analytics.html"
               class="nav-link text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
               >Analytics</a
             >
- 
-             <!-- Auth buttons (when not logged in) -->
-             <div id="auth-buttons" class="flex items-center space-x-2 ml-4">
-               <a
-                 href="login.html"
-                 class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
-                 >Login</a
-               >
-               <a
-                 href="signup.html"
-                 class="border border-purple-600 text-purple-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-50 transition-colors"
-                 >Sign Up</a
-               >
-             </div>
- 
-             <!-- User info (when logged in) -->
-             <div id="user-info" class="relative ml-4 hidden">
-               <button
-                 type="button"
-                 id="user-menu-btn"
-                 class="flex items-center space-x-2 hover:bg-purple-50 rounded-lg px-3 py-2 transition-colors"
-               >
-                 <div
-                   id="user-avatar"
-                   class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white font-bold text-sm"
-                 ></div>
-                 <span id="user-name" class="text-sm font-medium text-gray-700"></span>
-                 <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                 </svg>
-               </button>
-               
-               <!-- Dropdown menu -->
-               <div
-                 id="user-dropdown"
-                 class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50"
-               >
-                 <button
-                   type="button"
-                   id="logout-btn"
-                   class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
-                 >
-                   Logout
-                 </button>
-               </div>
-             </div>
-           </div>
- 
-           <div class="md:hidden flex items-center">
+
+            <!-- Auth buttons (when not logged in) -->
+            <div id="auth-buttons" class="flex items-center space-x-2 ml-4">
+              <a
+                href="login.html"
+                class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
+                >Login</a
+              >
+              <a
+                href="signup.html"
+                class="border border-purple-600 text-purple-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-50 transition-colors"
+                >Sign Up</a
+              >
+            </div>
+
+            <!-- User info (when logged in) -->
+            <div id="user-info" class="relative ml-4 hidden">
+              <button
+                type="button"
+                id="user-menu-btn"
+                class="flex items-center space-x-2 hover:bg-purple-50 rounded-lg px-3 py-2 transition-colors"
+              >
+                <div
+                  id="user-avatar"
+                  class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white font-bold text-sm"
+                ></div>
+                <span
+                  id="user-name"
+                  class="text-sm font-medium text-gray-700"
+                ></span>
+                <svg
+                  class="w-4 h-4 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  ></path>
+                </svg>
+              </button>
+
+              <!-- Dropdown menu -->
+              <div
+                id="user-dropdown"
+                class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50"
+              >
+                <button
+                  type="button"
+                  id="logout-btn"
+                  class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="md:hidden flex items-center">
             <button
               id="mobile-menu-button"
               class="inline-flex items-center justify-center p-2 rounded-lg text-gray-700 hover:text-purple-600 hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500 transition-colors"
@@ -398,72 +411,59 @@
     <script src="api-client.js"></script>
     <script src="pools.js"></script>
     <script>
-      // Handle authentication UI and logout
-      document.addEventListener('DOMContentLoaded', function() {
-        const logoutBtn = document.getElementById('logout-btn');
-        const authButtons = document.getElementById('auth-buttons');
-        const userInfo = document.getElementById('user-info');
-        const userMenuBtn = document.getElementById('user-menu-btn');
-        const userDropdown = document.getElementById('user-dropdown');
-        const userAvatar = document.getElementById('user-avatar');
-        const userName = document.getElementById('user-name');
-        const dropdownName = document.getElementById('dropdown-name');
-        const dropdownEmail = document.getElementById('dropdown-email');
+      document.addEventListener("DOMContentLoaded", function () {
+        const logoutBtn = document.getElementById("logout-btn");
+        const authButtons = document.getElementById("auth-buttons");
+        const userInfo = document.getElementById("user-info");
+        const userMenuBtn = document.getElementById("user-menu-btn");
+        const userDropdown = document.getElementById("user-dropdown");
+        const userAvatar = document.getElementById("user-avatar");
+        const userName = document.getElementById("user-name");
+        const dropdownName = document.getElementById("dropdown-name");
+        const dropdownEmail = document.getElementById("dropdown-email");
 
         function updateAuthUI() {
           if (window.cognitoAuth && window.cognitoAuth.isLoggedIn()) {
-            // User is logged in
-            authButtons.classList.add('hidden');
-            userInfo.classList.remove('hidden');
+            authButtons.classList.add("hidden");
+            userInfo.classList.remove("hidden");
             const user = window.cognitoAuth.getUser();
             if (user) {
               const name = user.name || user.email;
               const initial = name.charAt(0).toUpperCase();
-              
+
               userAvatar.textContent = initial;
-              userName.textContent = name.split('@')[0];
+              userName.textContent = name.split("@")[0];
               dropdownName.textContent = name;
               dropdownEmail.textContent = user.email;
             }
           } else {
-            // User is not logged in
-            authButtons.classList.remove('hidden');
-            userInfo.classList.add('hidden');
+            authButtons.classList.remove("hidden");
+            userInfo.classList.add("hidden");
           }
         }
-
-        // Toggle dropdown
         if (userMenuBtn) {
-          userMenuBtn.addEventListener('click', (e) => {
+          userMenuBtn.addEventListener("click", (e) => {
             e.stopPropagation();
-            userDropdown.classList.toggle('hidden');
+            userDropdown.classList.toggle("hidden");
           });
         }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-          if (userDropdown && !userDropdown.classList.contains('hidden')) {
-            userDropdown.classList.add('hidden');
+        document.addEventListener("click", (e) => {
+          if (userDropdown && !userDropdown.classList.contains("hidden")) {
+            userDropdown.classList.add("hidden");
           }
         });
-
-        // Prevent dropdown from closing when clicking inside it
         if (userDropdown) {
-          userDropdown.addEventListener('click', (e) => {
+          userDropdown.addEventListener("click", (e) => {
             e.stopPropagation();
           });
         }
-
-        // Logout handler
         if (logoutBtn) {
-          logoutBtn.addEventListener('click', () => {
+          logoutBtn.addEventListener("click", () => {
             if (window.cognitoAuth) {
               window.cognitoAuth.logout();
             }
           });
         }
-
-        // Update UI when page loads
         updateAuthUI();
       });
     </script>
