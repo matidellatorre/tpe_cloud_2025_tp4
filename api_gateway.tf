@@ -81,6 +81,18 @@ module "http_api" {
       filename      = "${path.module}/functions/lambda_get_analytics_overview.zip"
       handler       = "lambda_get_analytics_overview.handler"
     }
+    set_user_role = {
+      route_key     = "POST /users/role"
+      function_name = "set_user_role"
+      filename      = "${path.module}/functions/lambda_set_user_role.zip"
+      handler       = "lambda_set_user_role.handler"
+    }
+    get_user_role = {
+      route_key     = "GET /users/role"
+      function_name = "get_user_role"
+      filename      = "${path.module}/functions/lambda_get_user_role.zip"
+      handler       = "lambda_get_user_role.handler"
+    }
   }
 
   role            = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
@@ -90,11 +102,11 @@ module "http_api" {
   layers          = [aws_lambda_layer_version.psycopg2.arn]
 
   environment_variables = {
-    DB_HOST     = aws_db_proxy.this.endpoint
-    DB_PORT     = "5432"
-    DB_NAME     = aws_db_instance.this.db_name
-    DB_USER     = var.db_username
-    DB_PASSWORD = var.db_password
+    DB_HOST            = aws_db_proxy.this.endpoint
+    DB_PORT            = "5432"
+    DB_NAME            = aws_db_instance.this.db_name
+    DB_USER            = var.db_username
+    DB_PASSWORD        = var.db_password
     IMAGES_BUCKET_NAME = aws_s3_bucket.images_bucket.bucket
   }
 

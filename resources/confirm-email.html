@@ -116,12 +116,29 @@
             errorDiv.classList.add("hidden");
             successDiv.classList.add("hidden");
             await window.cognitoAuth.confirmSignup(email, code);
+            const role = localStorage.getItem("pending_role");
+            const password = localStorage.getItem("pending_password");
+            if (password) {
+              await window.cognitoAuth.login(email, password);
+            }
+            if (role) {
+              try {
+                await window.apiClient.setUserRole(email, role);
+                console.log("Role set successfully:", role);
+              } catch (roleError) {
+                console.error("Error setting role:", roleError);
+              }
+            }
             localStorage.setItem("user_email", email);
 
             successDiv.textContent =
               "Email confirmed successfully. Redirecting...";
             successDiv.classList.remove("hidden");
+
             localStorage.removeItem("pending_email");
+            localStorage.removeItem("pending_role");
+            localStorage.removeItem("pending_password");
+
             setTimeout(() => {
               window.location.href = "index.html";
             }, 2000);
