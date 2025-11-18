@@ -63,6 +63,24 @@ module "http_api" {
       filename      = "${path.module}/functions/lambda_get_presigned_url.zip"
       handler       = "lambda_get_presigned_url.handler"
     }
+    get_analytics_pools_sales = {
+      route_key     = "GET /analytics/pools/sales"
+      function_name = "get_analytics_pools_sales"
+      filename      = "${path.module}/functions/lambda_get_analytics_pools_sales.zip"
+      handler       = "lambda_get_analytics_pools_sales.handler"
+    }
+    get_analytics_customers_savings = {
+      route_key     = "GET /analytics/customers/savings"
+      function_name = "get_analytics_customers_savings"
+      filename      = "${path.module}/functions/lambda_get_analytics_customers_savings.zip"
+      handler       = "lambda_get_analytics_customers_savings.handler"
+    }
+    get_analytics_overview = {
+      route_key     = "GET /analytics/overview"
+      function_name = "get_analytics_overview"
+      filename      = "${path.module}/functions/lambda_get_analytics_overview.zip"
+      handler       = "lambda_get_analytics_overview.handler"
+    }
   }
 
   role            = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"

@@ -146,6 +146,19 @@ class ApiClient {
       throw error; // Re-throw the error to be caught by the caller
     }
   }
+
+  // Analytics
+  async getAnalyticsOverview() {
+    return this.request('/analytics/overview');
+  }
+
+  async getAnalyticsPoolsSales() {
+    return this.request('/analytics/pools/sales');
+  }
+
+  async getAnalyticsCustomersSavings() {
+    return this.request('/analytics/customers/savings');
+  }
 }
 
 // Crear instancia global del cliente API

@@ -1,0 +1,108 @@
+import json
+import os
+
+import psycopg2
+
+db_host = os.environ.get("DB_HOST")
+db_port = os.environ.get("DB_PORT")
+db_name = os.environ.get("DB_NAME")
+db_user = os.environ.get("DB_USER")
+db_password = os.environ.get("DB_PASSWORD")
+
+
+def get_db_connection():
+    try:
+        conn = psycopg2.connect(
+            host=db_host,
+            port=db_port,
+            dbname=db_name,
+            user=db_user,
+            password=db_password,
+        )
+        return conn
+
+    except psycopg2.Error as e:
+        print(f"Error connecting to PostgreSQL: {e}")
+        return None
+
+
+def handler(event, context):
+    conn = get_db_connection()
+    if conn is None:
+        return {
+            "statusCode": 500,
+            "body": json.dumps({"error": "Could not connect to the database"}),
+        }
+
+    try:
+        with conn.cursor() as cur:
+            # Get sales metrics by pool
+            # Calculate: total quantity sold, revenue, number of participants, pool status
+            cur.execute(
+                """
+                SELECT
+                    p.id as pool_id,
+                    pr.name as product_name,
+                    pr.unit_price,
+                    p.min_quantity,
+                    p.start_at,
+                    p.end_at,
+                    COALESCE(SUM(r.quantity), 0) as total_quantity_sold,
+                    COUNT(DISTINCT r.email) as total_participants,
+                    COALESCE(SUM(r.quantity), 0) * pr.unit_price as total_revenue,
+                    CASE 
+                        WHEN COALESCE(SUM(r.quantity), 0) >= p.min_quantity THEN true
+                        ELSE false
+                    END as reached_min_quantity,
+                    CASE 
+                        WHEN COALESCE(SUM(r.quantity), 0) >= p.min_quantity THEN 
+                            COALESCE(SUM(r.quantity), 0) * pr.unit_price * 0.15
+                        ELSE 0
+                    END as total_savings
+                FROM pool p
+                JOIN product pr ON p.product_id = pr.id
+                LEFT JOIN request r ON p.id = r.pool_id
+                GROUP BY p.id, pr.name, pr.unit_price, p.min_quantity, p.start_at, p.end_at
+                ORDER BY p.created_at DESC
+            """
+            )
+            pools = cur.fetchall()
+            
+            pool_sales = []
+            for row in pools:
+                pool_sales.append({
+                    "pool_id": row[0],
+                    "product_name": row[1],
+                    "unit_price": float(row[2]) if row[2] is not None else 0,
+                    "min_quantity": row[3],
+                    "start_at": row[4].isoformat() if row[4] else None,
+                    "end_at": row[5].isoformat() if row[5] else None,
+                    "total_quantity_sold": int(row[6]),
+                    "total_participants": int(row[7]),
+                    "total_revenue": float(row[8]) if row[8] is not None else 0,
+                    "reached_min_quantity": row[9],
+                    "total_savings": float(row[10]) if row[10] is not None else 0,
+                })
+
+            return {
+                "statusCode": 200,
+                "headers": {"Access-Control-Allow-Origin": "*"},
+                "body": json.dumps(pool_sales),
+            }
+
+    except (Exception, psycopg2.Error) as e:
+        print(f"Error executing query: {e}")
+        return {
+            "statusCode": 500,
+            "body": json.dumps(
+                {
+                    "error": "An error occurred",
+                    "details": str(e),
+                }
+            ),
+        }
+
+    finally:
+        if conn:
+            conn.close()
+
