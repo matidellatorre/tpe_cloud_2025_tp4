@@ -12,9 +12,8 @@ class ApiClient {
 
   async request(endpoint, options = {}) {
     const url = `${this.baseUrl}${endpoint}`;
-    const accessToken = window.cognitoAuth
-      ? window.cognitoAuth.getAccessToken()
-      : null;
+
+    const accessToken = localStorage.getItem("cognito_access_token");
 
     const defaultOptions = {
       headers: {
@@ -31,8 +30,13 @@ class ApiClient {
       const response = await fetch(url, config);
 
       if (response.status === 401) {
-        localStorage.setItem("redirect_after_login", window.location.href);
-        window.location.href = "login.html";
+        const currentPage = window.location.pathname.split("/").pop();
+        const publicPages = ["index.html", "login.html", "signup.html", "confirm-email.html", "callback.html", "/", ""];
+
+        if (!publicPages.includes(currentPage)) {
+          localStorage.setItem("redirect_after_login", window.location.href);
+          window.location.href = "login.html";
+        }
         return;
       }
 

@@ -6,6 +6,14 @@ class CognitoAuth {
   }
 
   init() {
+    const currentPage = window.location.pathname.split("/").pop();
+    const publicPages = ["index.html", "login.html", "signup.html", "confirm-email.html", "callback.html", "/", ""];
+
+    if (publicPages.includes(currentPage)) {
+      this.checkAuthStatus();
+      return;
+    }
+
     const isAuth = this.checkAuthStatus();
     if (isAuth) {
       this.fetchAndSaveUserRole().catch(err => {
