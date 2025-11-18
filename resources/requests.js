@@ -4,7 +4,7 @@ let currentFilter = "all";
 document.addEventListener("DOMContentLoaded", async () => {
   await loadRequests();
   renderRequests();
-  updateStats();
+  // updateStats();
   setupMobileMenu();
 });
 
@@ -21,18 +21,32 @@ function setupMobileMenu() {
 
 function getStatusInfo(status) {
   switch (status) {
-    case 'open':
-      return { text: 'Active', classes: 'bg-green-100 text-green-800', color: 'green'};
-    case 'success':
-      return { text: 'Completed', classes: 'bg-blue-100 text-blue-800', color: 'blue' };
-    case 'failed':
-      return { text: 'Closed', classes: 'bg-red-100 text-red-800', color: 'red' };
+    case "open":
+      return {
+        text: "Active",
+        classes: "bg-green-100 text-green-800",
+        color: "green",
+      };
+    case "success":
+      return {
+        text: "Completed",
+        classes: "bg-blue-100 text-blue-800",
+        color: "blue",
+      };
+    case "failed":
+      return {
+        text: "Closed",
+        classes: "bg-red-100 text-red-800",
+        color: "red",
+      };
     default:
-      return { text: status, classes: 'bg-gray-100 text-gray-800', color: 'gray'};
+      return {
+        text: status,
+        classes: "bg-gray-100 text-gray-800",
+        color: "gray",
+      };
   }
 }
-
-// Removed filterRequests UI handler: filtering UI not implemented
 
 function renderRequests() {
   const container = document.getElementById("requests-container");
@@ -41,7 +55,7 @@ function renderRequests() {
   let filteredRequests = requestsData;
   if (currentFilter !== "all") {
     filteredRequests = requestsData.filter(
-      (req) => req.status === currentFilter
+      (req) => req.status === currentFilter,
     );
   }
 
@@ -58,36 +72,33 @@ function renderRequests() {
 }
 
 function createRequestCard(request) {
-    const statusInfo = getStatusInfo(request.pool?.status);
+  const statusInfo = getStatusInfo(request.pool?.status);
+  const today = new Date();
+  const deadline = new Date(request.pool?.end_at);
+  const daysRemaining = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
 
-    // Calculate days remaining
-    const today = new Date();
-    const deadline = new Date(request.pool?.end_at);
-    const daysRemaining = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
-    
-    let statusText = statusInfo.text;
-    if (request.pool?.status === 'open') {
-        if (daysRemaining >= 0) {
-            statusText = `Waiting for pool to complete (${daysRemaining} days left)`;
-        } else {
-            statusText = 'Pool expired before completion';
-        }
+  let statusText = statusInfo.text;
+
+  if (request.pool?.status === "open") {
+    if (daysRemaining >= 0) {
+      statusText = `Waiting for pool to complete (${daysRemaining} days left)`;
+    } else {
+      statusText = "Pool expired before completion";
     }
+  }
 
-    const icon = {
-        open: `<svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  const icon = {
+    open: `<svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>`,
-        success: `<svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    success: `<svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>`,
-        failed: `<svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    failed: `<svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>`
-    };
-    
-    const statusIcon = icon[request.pool?.status] || icon.failed;
-
+            </svg>`,
+  };
+  const statusIcon = icon[request.pool?.status] || icon.failed;
   return `
         <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-200">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -95,12 +106,8 @@ function createRequestCard(request) {
                 <div class="flex-1">
                     <div class="flex items-start justify-between mb-3">
                         <div class="flex-1">
-                            <h3 class="text-xl font-bold text-gray-900 mb-1">Pool Request #${
-                              request.id
-                            }</h3>
-                            <p class="text-sm text-gray-500">Pool ID: ${
-                              request.pool_id
-                            }</p>
+                            <h3 class="text-xl font-bold text-gray-900 mb-1">Pool Request #${request.id}</h3>
+                            <p class="text-sm text-gray-500">Pool ID: ${request.pool_id}</p>
                             ${
                               request.pool?.product
                                 ? `
@@ -109,34 +116,26 @@ function createRequestCard(request) {
                                 : ""
                             }
                         </div>
+
                         <span class="px-3 py-1 rounded-full text-xs font-medium ${statusInfo.classes} capitalize ml-2">
                             ${statusInfo.text}
                         </span>
                     </div>
-
                     <!-- Status Info -->
                     <div class="flex items-center space-x-2 mb-4 text-${statusInfo.color}-600">
                         ${statusIcon}
                         <span class="text-sm font-medium">${statusText}</span>
                     </div>
-
                     <!-- Request Details -->
                     <div class="flex items-center space-x-2 text-xs text-gray-600 mb-3">
                         <div class="flex items-center">
                             <div class="w-2 h-2 rounded-full bg-gray-400 mr-1"></div>
-                            <span>Requested: ${formatDate(
-                              request.created_at
-                            )}</span>
+                            <span>Requested: ${formatDate(request.created_at)}</span>
                         </div>
                     </div>
-
                     <div class="bg-gray-50 rounded-lg px-3 py-2 mb-3">
-                        <p class="text-xs text-gray-600">Email: ${
-                          request.email
-                        }</p>
-                        <p class="text-xs text-gray-600">Quantity: ${
-                          request.quantity
-                        }</p>
+                        <p class="text-xs text-gray-600">Email: ${request.email}</p>
+                        <p class="text-xs text-gray-600">Quantity: ${request.quantity}</p>
                     </div>
                 </div>
 
@@ -144,20 +143,14 @@ function createRequestCard(request) {
                 <div class="lg:text-right border-t lg:border-t-0 lg:border-l lg:pl-6 pt-4 lg:pt-0 border-gray-200">
                     <div class="mb-3">
                         <p class="text-xs text-gray-500 mb-1">Pool Request</p>
-                        <p class="text-2xl font-bold text-gray-900">#${
-                          request.id
-                        }</p>
+                        <p class="text-2xl font-bold text-gray-900">#${request.id}</p>
                     </div>
                     <div class="bg-purple-50 rounded-lg px-4 py-2 mb-3">
                         <p class="text-xs text-gray-600">Quantity</p>
-                        <p class="text-xl font-bold text-purple-600">${
-                          request.quantity
-                        }</p>
+                        <p class="text-xl font-bold text-purple-600">${request.quantity}</p>
                     </div>
                     <div class="flex flex-col gap-2">
-                        <button onclick="viewPoolDetails(${
-                          request.pool_id
-                        })" class="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        <button onclick="viewPoolDetails(${request.pool_id})" class="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
                             View Pool
                         </button>
                     </div>
@@ -197,7 +190,7 @@ async function loadRequests() {
 
           if (poolWithProduct.product_id) {
             const product = await window.apiClient.getProduct(
-              poolWithProduct.product_id
+              poolWithProduct.product_id,
             );
             poolWithProduct.product = product;
           } else {
@@ -215,7 +208,7 @@ async function loadRequests() {
         } catch (error) {
           console.error(
             `Error loading product for request ${request.id}:`,
-            error
+            error,
           );
           allRequests.push({
             ...request,
@@ -249,7 +242,7 @@ function updateStats() {
   const totalRequests = requestsData.length;
   const totalQuantity = requestsData.reduce(
     (sum, r) => sum + (r.quantity || 0),
-    0
+    0,
   );
 
   document.getElementById("pending-count").textContent = totalRequests;

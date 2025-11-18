@@ -12,27 +12,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function getStatusInfo(status) {
   switch (status) {
-    case 'open':
-      return { text: 'Active', classes: 'bg-green-100 text-green-800' };
-    case 'success':
-      return { text: 'Completed', classes: 'bg-blue-100 text-blue-800' };
-    case 'failed':
-      return { text: 'Closed', classes: 'bg-red-100 text-red-800' };
+    case "open":
+      return { text: "Active", classes: "bg-green-100 text-green-800" };
+    case "success":
+      return { text: "Completed", classes: "bg-blue-100 text-blue-800" };
+    case "failed":
+      return { text: "Closed", classes: "bg-red-100 text-red-800" };
     default:
-      return { text: status, classes: 'bg-gray-100 text-gray-800' };
+      return { text: status, classes: "bg-gray-100 text-gray-800" };
   }
 }
 
-// Pools data - will be loaded from API
 let poolsData = [];
 let productsData = [];
 
-// Get user role from localStorage or fetch from API
 async function getUserRole() {
-  // First check localStorage
   let role = localStorage.getItem("user_role");
 
-  // If not in localStorage and user is authenticated, fetch from API
   if (!role && window.cognitoAuth && window.cognitoAuth.isLoggedIn()) {
     try {
       role = await window.cognitoAuth.fetchAndSaveUserRole();
@@ -44,7 +40,6 @@ async function getUserRole() {
   return role;
 }
 
-// Update UI based on user role
 async function updateUIBasedOnRole() {
   const createPoolBtn = document.getElementById("create-pool-btn");
   const createFirstPoolBtn = document.getElementById("create-first-pool-btn");
@@ -226,7 +221,7 @@ async function loadPools() {
             },
           };
         }
-      })
+      }),
     );
 
     poolsData = poolsWithProducts;
@@ -262,10 +257,8 @@ function createPoolCard(pool) {
   const today = new Date();
   const deadline = new Date(pool.end_at);
   const daysRemaining = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
-  const isExpired = daysRemaining < 0;
   const statusInfo = getStatusInfo(pool.status);
 
-  // Get user role to conditionally show Join Pool button
   const userRole = localStorage.getItem("user_role");
   const canJoinPool = userRole === "client";
 
@@ -289,7 +282,7 @@ function createPoolCard(pool) {
                 <div class="flex justify-between items-center mb-2">
                     <div>
                         <span class="text-2xl font-bold text-gray-900">$${price.toFixed(
-                          2
+                          2,
                         )}</span>
                         <span class="text-sm text-gray-500 ml-2">per unit</span>
                     </div>
@@ -303,7 +296,7 @@ function createPoolCard(pool) {
                     <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <span class="${pool.status === 'open' && daysRemaining < 0 ? 'text-red-600 font-medium' : ''}">${pool.status === 'open' ? (daysRemaining >= 0 ? `${daysRemaining} days left` : 'Expired') : 'Ended'}</span>
+                    <span class="${pool.status === "open" && daysRemaining < 0 ? "text-red-600 font-medium" : ""}">${pool.status === "open" ? (daysRemaining >= 0 ? `${daysRemaining} days left` : "Expired") : "Ended"}</span>
                 </div>
                 <div class="text-xs text-gray-500">
                     ${formatDate(pool.start_at)} - ${formatDate(pool.end_at)}
@@ -311,14 +304,10 @@ function createPoolCard(pool) {
             </div>
 
             <div class="flex space-x-2">
-                ${pool.status === 'open' && daysRemaining >= 0 ? `
-                    <button onclick="joinPool(${pool.id})" class="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-md">
-                        Join Pool
-                    </button>
-                `
-                    : !isExpired
+                ${
+                  pool.status === "open" && daysRemaining >= 0
                     ? `
-                    <button disabled class="flex-1 bg-gray-300 text-gray-500 px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed" title="Only clients can join pools">
+                    <button ${canJoinPool ? 'onclick="joinPool(${pool.id})"' : 'disabled'} class="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-md">
                         Join Pool
                     </button>
                 `
@@ -342,9 +331,9 @@ function createPoolCard(pool) {
 }
 
 async function joinPool(poolId) {
-  const pool = poolsData.find(p => p.id === poolId);
-  if (pool && pool.status === 'open') {
-      openJoinPoolModal(pool);
+  const pool = poolsData.find((p) => p.id === poolId);
+  if (pool && pool.status === "open") {
+    openJoinPoolModal(pool);
   }
 }
 
@@ -487,12 +476,6 @@ function closeJoinPoolModal() {
   }
 }
 
-function isExpired(endDate) {
-  const today = new Date();
-  const deadline = new Date(endDate);
-  return deadline < today;
-}
-
 function viewPoolDetails(poolId) {
   const pool = poolsData.find((p) => p.id === poolId);
   if (pool) {
@@ -512,7 +495,7 @@ async function loadProductsForForm() {
       const option = document.createElement("option");
       option.value = product.id;
       option.textContent = `${product.name} - $${product.unit_price.toFixed(
-        2
+        2,
       )}`;
       productSelect.appendChild(option);
     });

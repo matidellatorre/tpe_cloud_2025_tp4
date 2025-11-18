@@ -47,14 +47,9 @@ def create_tables(conn):
         start_at DATE NOT NULL,
         end_at DATE NOT NULL,
         min_quantity INTEGER NOT NULL CHECK (min_quantity > 0),
-        
-        -- CAMPO NUEVO --
-        status VARCHAR(10) NOT NULL DEFAULT 'open', -- Valores: open, success, failed
-
+        status VARCHAR(10) NOT NULL DEFAULT 'open',
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        
-        -- VALIDACIÓN AÑADIDA --
         CHECK (status IN ('open', 'success', 'failed'))
     );
     """

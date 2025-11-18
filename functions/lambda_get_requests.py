@@ -36,12 +36,10 @@ def handler(event, context):
         }
 
     try:
-        # Obtener parámetros de query
         query_params = event.get("queryStringParameters", {}) or {}
         email = query_params.get("email")
         pool_id = query_params.get("pool_id")
 
-        # Validar que al menos uno de los parámetros esté presente
         if not email and not pool_id:
             return {
                 "statusCode": 400,
@@ -52,20 +50,11 @@ def handler(event, context):
             }
 
         with conn.cursor() as cur:
-            # Si se proporciona email, buscar por email
             if email:
                 cur.execute(
                     """
-                    SELECT 
-                        r.id, 
-                        r.pool_id, 
-                        r.email, 
-                        r.quantity, 
-                        r.created_at,
-                        p.product_id,
-                        p.start_at,
-                        p.end_at,
-                        p.min_quantity
+                    SELECT r.id, r.pool_id, r.email, r.quantity, r.created_at,
+                        p.product_id, p.status, p.start_at, p.end_at, p.min_quantity
                     FROM request r
                     LEFT JOIN pool p ON r.pool_id = p.id
                     WHERE r.email = %s
@@ -81,14 +70,17 @@ def handler(event, context):
                         "email": row[2],
                         "quantity": row[3],
                         "created_at": row[4].isoformat(),
-                        "pool": {
-                            "product_id": row[5],
-                            "start_at": row[6].isoformat() if row[6] else None,
-                            "end_at": row[7].isoformat() if row[7] else None,
-                            "min_quantity": row[8],
-                        }
-                        if row[5]
-                        else None,
+                        "pool": (
+                            {
+                                "product_id": row[5],
+                                "status": row[6],
+                                "start_at": row[7].isoformat() if row[7] else None,
+                                "end_at": row[8].isoformat() if row[8] else None,
+                                "min_quantity": row[9],
+                            }
+                            if row[5]
+                            else None
+                        ),
                     }
                     for row in requests
                 ]
