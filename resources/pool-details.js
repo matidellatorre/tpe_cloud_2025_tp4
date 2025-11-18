@@ -116,7 +116,7 @@ function displayPoolDetails() {
 
 async function loadPoolRequests(poolId) {
   try {
-    poolRequests = await window.apiClient.getPoolRequests(poolId);
+    poolRequests = await window.apiClient.getRequests({ pool_id: poolId });
   } catch (error) {
     poolRequests = [];
   }

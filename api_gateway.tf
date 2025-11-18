@@ -45,11 +45,11 @@ module "http_api" {
       filename      = "${path.module}/functions/lambda_get_pool_details.zip"
       handler       = "lambda_get_pool_details.handler"
     }
-    get_pool_requests = {
-      route_key     = "GET /pools/{id}/requests"
-      function_name = "get_pool_requests"
-      filename      = "${path.module}/functions/lambda_get_pool_requests.zip"
-      handler       = "lambda_get_pool_requests.handler"
+    get_requests = {
+      route_key     = "GET /requests"
+      function_name = "get_requests"
+      filename      = "${path.module}/functions/lambda_get_requests.zip"
+      handler       = "lambda_get_requests.handler"
     }
     post_pool_requests = {
       route_key     = "POST /pools/{id}/requests"

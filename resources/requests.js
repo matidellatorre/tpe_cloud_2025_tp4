@@ -142,43 +142,74 @@ async function loadRequests() {
   try {
     const loading = document.getElementById("requests-loading");
     if (loading) loading.classList.remove("hidden");
-    const pools = await window.apiClient.getPools();
-    const allRequests = [];
 
-    for (const pool of pools) {
-      try {
-        let poolWithProduct = pool;
+    // Obtener el email del usuario (solo clientes pueden acceder a esta página)
+    const userEmail = localStorage.getItem("user_email");
+
+    if (!userEmail) {
+      console.error("No user email found");
+      if (loading) loading.classList.add("hidden");
+      showNotification("Error loading requests. Please login again.", "error");
+      return;
+    }
+
+    let allRequests = [];
+
+    try {
+      // Obtener requests del usuario usando la nueva lambda unificada
+      const userRequests = await window.apiClient.getRequests({
+        email: userEmail,
+      });
+
+      // Enriquecer cada request con información del producto
+      for (const request of userRequests) {
         try {
-          const product = await window.apiClient.getProduct(pool.product_id);
-          poolWithProduct = {
-            ...pool,
-            product: product,
-          };
-        } catch (error) {
-          poolWithProduct = {
-            ...pool,
-            product: {
-              id: pool.product_id,
+          let poolWithProduct = request.pool || {};
+
+          if (poolWithProduct.product_id) {
+            const product = await window.apiClient.getProduct(
+              poolWithProduct.product_id
+            );
+            poolWithProduct.product = product;
+          } else {
+            poolWithProduct.product = {
               name: "Product not found",
               description: "Product information unavailable",
               unit_price: 0,
-            },
-          };
-        }
+            };
+          }
 
-        const poolRequests = await window.apiClient.getPoolRequests(pool.id);
-        const requestsWithPoolInfo = poolRequests.map((request) => ({
-          ...request,
-          pool: poolWithProduct,
-        }));
-        allRequests.push(...requestsWithPoolInfo);
-      } catch (error) {}
+          allRequests.push({
+            ...request,
+            pool: poolWithProduct,
+          });
+        } catch (error) {
+          console.error(
+            `Error loading product for request ${request.id}:`,
+            error
+          );
+          allRequests.push({
+            ...request,
+            pool: {
+              ...request.pool,
+              product: {
+                name: "Product not found",
+                description: "Product information unavailable",
+                unit_price: 0,
+              },
+            },
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error loading user requests:", error);
     }
 
     requestsData = allRequests;
 
     if (loading) loading.classList.add("hidden");
   } catch (error) {
+    console.error("Error in loadRequests:", error);
     const loading = document.getElementById("requests-loading");
     if (loading) loading.classList.add("hidden");
     showNotification("Error loading requests. Please refresh the page.");

@@ -77,12 +77,15 @@
               >
                 <div
                   id="user-avatar"
-                  class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white font-bold text-sm"
+                  class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white font-bold text-base"
                 ></div>
-                <span
-                  id="user-name"
-                  class="text-sm font-medium text-gray-700"
-                ></span>
+                <div class="flex flex-col">
+                  <span
+                    id="user-email"
+                    class="text-sm font-medium text-gray-900"
+                  ></span>
+                  <span id="user-role" class="text-xs text-gray-500"></span>
+                </div>
                 <svg
                   class="w-4 h-4 text-gray-500"
                   fill="none"
@@ -187,7 +190,7 @@
           </div>
           <button
             id="add-product-btn"
-            class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all flex items-center space-x-2"
+            class="hidden bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all flex items-center space-x-2"
           >
             <svg
               class="w-5 h-5"
@@ -448,6 +451,7 @@
     <script src="api-client.js"></script>
     <script src="auth.js"></script>
     <script src="auth-guard.js"></script>
+    <script src="nav-role-handler.js"></script>
     <script src="products.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
@@ -457,23 +461,29 @@
         const userMenuBtn = document.getElementById("user-menu-btn");
         const userDropdown = document.getElementById("user-dropdown");
         const userAvatar = document.getElementById("user-avatar");
-        const userName = document.getElementById("user-name");
-        const dropdownName = document.getElementById("dropdown-name");
-        const dropdownEmail = document.getElementById("dropdown-email");
+        const userEmail = document.getElementById("user-email");
+        const userRole = document.getElementById("user-role");
 
         function updateAuthUI() {
           if (window.cognitoAuth && window.cognitoAuth.isLoggedIn()) {
             authButtons.classList.add("hidden");
             userInfo.classList.remove("hidden");
-            const user = window.cognitoAuth.getUser();
-            if (user) {
-              const name = user.name || user.email;
-              const initial = name.charAt(0).toUpperCase();
 
-              userAvatar.textContent = initial;
-              userName.textContent = name.split("@")[0];
-              dropdownName.textContent = name;
-              dropdownEmail.textContent = user.email;
+            const email =
+              localStorage.getItem("user_email") || "user@example.com";
+            const role = localStorage.getItem("user_role");
+            const initial = email.charAt(0).toUpperCase();
+
+            if (userAvatar) userAvatar.textContent = initial;
+            if (userEmail) userEmail.textContent = email;
+            if (userRole) {
+              const roleText =
+                role === "client"
+                  ? "Client"
+                  : role === "company"
+                  ? "Company"
+                  : "User";
+              userRole.textContent = `Role: ${roleText}`;
             }
           } else {
             authButtons.classList.remove("hidden");

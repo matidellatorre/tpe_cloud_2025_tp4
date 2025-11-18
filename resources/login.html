@@ -86,7 +86,7 @@
             await window.cognitoAuth.loginWithPassword(email, password);
 
             // Save user email in localStorage
-            localStorage.setItem('user_email', email);
+            localStorage.setItem("user_email", email);
 
             // Fetch and save user role
             try {
@@ -108,5 +108,6 @@
     <script src="config.js"></script>
     <script src="api-client.js"></script>
     <script src="auth.js"></script>
+    <script src="nav-role-handler.js"></script>
   </body>
 </html>

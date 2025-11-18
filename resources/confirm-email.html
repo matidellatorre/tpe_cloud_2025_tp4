@@ -115,7 +115,7 @@
 
             await window.cognitoAuth.confirmSignup(email, code);
 
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise((resolve) => setTimeout(resolve, 500));
 
             const role = localStorage.getItem("pending_role");
 
@@ -137,7 +137,9 @@
                 console.error("Error fetching role:", roleError);
               }
             } else if (role) {
-              console.warn("API client not available, saving role to localStorage only");
+              console.warn(
+                "API client not available, saving role to localStorage only"
+              );
               localStorage.setItem("user_role", role);
             }
 
@@ -184,5 +186,6 @@
     <script src="config.js"></script>
     <script src="api-client.js"></script>
     <script src="auth.js"></script>
+    <script src="nav-role-handler.js"></script>
   </body>
 </html>

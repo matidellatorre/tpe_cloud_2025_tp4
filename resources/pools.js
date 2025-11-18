@@ -14,34 +14,36 @@ let productsData = [];
 
 // Get user role from localStorage or fetch from API
 async function getUserRole() {
-    // First check localStorage
-    let role = localStorage.getItem('user_role');
+  // First check localStorage
+  let role = localStorage.getItem("user_role");
 
-    // If not in localStorage and user is authenticated, fetch from API
-    if (!role && window.cognitoAuth && window.cognitoAuth.isLoggedIn()) {
-        try {
-            role = await window.cognitoAuth.fetchAndSaveUserRole();
-        } catch (error) {
-            console.error('Error fetching user role:', error);
-        }
+  // If not in localStorage and user is authenticated, fetch from API
+  if (!role && window.cognitoAuth && window.cognitoAuth.isLoggedIn()) {
+    try {
+      role = await window.cognitoAuth.fetchAndSaveUserRole();
+    } catch (error) {
+      console.error("Error fetching user role:", error);
     }
+  }
 
-    return role;
+  return role;
 }
 
 // Update UI based on user role
 async function updateUIBasedOnRole() {
-    const createPoolBtn = document.getElementById('create-pool-btn');
-    if (!createPoolBtn) return;
+  const createPoolBtn = document.getElementById("create-pool-btn");
+  const createFirstPoolBtn = document.getElementById("create-first-pool-btn");
 
-    const role = await getUserRole();
+  const role = await getUserRole();
 
-    // Only show Create Pool button for company users
-    if (role === 'company') {
-        createPoolBtn.classList.remove('hidden');
-    } else {
-        createPoolBtn.classList.add('hidden');
-    }
+  // Only show Create Pool buttons for company users
+  if (role === "company") {
+    if (createPoolBtn) createPoolBtn.classList.remove("hidden");
+    if (createFirstPoolBtn) createFirstPoolBtn.classList.remove("hidden");
+  } else {
+    if (createPoolBtn) createPoolBtn.classList.add("hidden");
+    if (createFirstPoolBtn) createFirstPoolBtn.classList.add("hidden");
+  }
 }
 
 async function initializePools() {
@@ -69,7 +71,11 @@ async function initializePools() {
   await loadProductsForForm();
 
   // If role wasn't in localStorage, wait a bit and refresh UI after role is fetched
-  if (!localStorage.getItem("user_role") && window.cognitoAuth && window.cognitoAuth.isLoggedIn()) {
+  if (
+    !localStorage.getItem("user_role") &&
+    window.cognitoAuth &&
+    window.cognitoAuth.isLoggedIn()
+  ) {
     setTimeout(async () => {
       await updateUIBasedOnRole();
       // Re-render pools to update Join Pool buttons
@@ -298,15 +304,20 @@ function createPoolCard(pool) {
             </div>
 
             <div class="flex space-x-2">
-                ${!isExpired && canJoinPool ? `
+                ${
+                  !isExpired && canJoinPool
+                    ? `
                     <button onclick="joinPool(${pool.id})" class="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-md">
                         Join Pool
                     </button>
-                ` : !isExpired ? `
+                `
+                    : !isExpired
+                    ? `
                     <button disabled class="flex-1 bg-gray-300 text-gray-500 px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed" title="Only clients can join pools">
                         Join Pool
                     </button>
-                ` : `
+                `
+                    : `
                     <button disabled class="flex-1 bg-gray-300 text-gray-500 px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed">
                         Expired
                     </button>

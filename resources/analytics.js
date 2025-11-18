@@ -268,19 +268,28 @@ function setupAuthUI() {
   const userMenuBtn = document.getElementById("user-menu-btn");
   const userDropdown = document.getElementById("user-dropdown");
   const userAvatar = document.getElementById("user-avatar");
-  const userName = document.getElementById("user-name");
+  const userEmail = document.getElementById("user-email");
+  const userRole = document.getElementById("user-role");
 
   function updateAuthUI() {
     if (window.cognitoAuth && window.cognitoAuth.isLoggedIn()) {
       authButtons.classList.add("hidden");
       userInfo.classList.remove("hidden");
 
-      const user = window.cognitoAuth.getUser();
-      if (user) {
-        const name = user.name || user.email || "User";
-        const initial = name.charAt(0).toUpperCase();
-        userAvatar.textContent = initial;
-        userName.textContent = name.split("@")[0];
+      const email = localStorage.getItem("user_email") || "user@example.com";
+      const role = localStorage.getItem("user_role");
+      const initial = email.charAt(0).toUpperCase();
+
+      if (userAvatar) userAvatar.textContent = initial;
+      if (userEmail) userEmail.textContent = email;
+      if (userRole) {
+        const roleText =
+          role === "client"
+            ? "Client"
+            : role === "company"
+            ? "Company"
+            : "User";
+        userRole.textContent = `Role: ${roleText}`;
       }
     } else {
       authButtons.classList.remove("hidden");

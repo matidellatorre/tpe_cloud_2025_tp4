@@ -90,11 +90,18 @@ class ApiClient {
       body: JSON.stringify(poolData),
     });
   }
-  async getPoolRequests(poolId = null) {
-    if (!poolId) {
-      throw new Error("poolId is required to get pool requests");
+  async getRequests(params = {}) {
+    const { email, pool_id } = params;
+    
+    if (!email && !pool_id) {
+      throw new Error("Either email or pool_id is required to get requests");
     }
-    return this.request(`/pools/${poolId}/requests`);
+    
+    const queryParams = new URLSearchParams();
+    if (email) queryParams.append('email', email);
+    if (pool_id) queryParams.append('pool_id', pool_id);
+    
+    return this.request(`/requests?${queryParams.toString()}`);
   }
 
   async createPoolRequest(poolId, requestData) {
