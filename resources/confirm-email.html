@@ -122,6 +122,26 @@
             // Confirm signup with the code
             await window.cognitoAuth.confirmSignup(email, code);
 
+            // Get the role that was selected during signup
+            const role = localStorage.getItem("pending_role");
+
+            // Log in the user automatically to get the token
+            const password = localStorage.getItem("pending_password");
+            if (password) {
+              await window.cognitoAuth.login(email, password);
+            }
+
+            // Set the user role if it was selected during signup
+            if (role) {
+              try {
+                await window.apiClient.setUserRole(email, role);
+                console.log("Role set successfully:", role);
+              } catch (roleError) {
+                console.error("Error setting role:", roleError);
+                // Continue anyway, user can set role later
+              }
+            }
+
             // Save user email in localStorage
             localStorage.setItem('user_email', email);
 
@@ -129,10 +149,12 @@
               "Email confirmed successfully. Redirecting...";
             successDiv.classList.remove("hidden");
 
-            // Clear pending email
+            // Clear pending data
             localStorage.removeItem("pending_email");
+            localStorage.removeItem("pending_role");
+            localStorage.removeItem("pending_password");
 
-            // Redirect to index after 2 seconds
+            // Redirect to home page after 2 seconds
             setTimeout(() => {
               window.location.href = "index.html";
             }, 2000);
