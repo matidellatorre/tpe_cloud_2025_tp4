@@ -41,10 +41,19 @@ class ApiClient {
       }
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
+        let errorText;
+        try {
+          const errorJson = await response.json();
+          errorText = errorJson.error || JSON.stringify(errorJson);
+        } catch {
+          errorText = await response.text();
+        }
+        const error = new Error(
           `HTTP error! status: ${response.status} - ${errorText}`
         );
+        error.status = response.status;
+        error.responseText = errorText;
+        throw error;
       }
 
       const data = await response.json();
@@ -137,10 +146,6 @@ class ApiClient {
 
   async getAnalyticsPoolsSales() {
     return this.request("/analytics/pools/sales");
-  }
-
-  async getAnalyticsCustomersSavings() {
-    return this.request("/analytics/customers/savings");
   }
 
   async setUserRole(email, role) {

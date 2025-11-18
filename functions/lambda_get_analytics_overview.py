@@ -26,6 +26,39 @@ def get_db_connection():
         return None
 
 
+def get_user_sub_from_token(event):
+    try:
+        request_context = event.get("requestContext", {})
+        authorizer = request_context.get("authorizer", {})
+
+        claims = authorizer.get("claims", {})
+        if not claims:
+            jwt = authorizer.get("jwt", {})
+            claims = jwt.get("claims", {})
+
+        sub = claims.get("sub")
+        if sub:
+            return sub
+
+        return None
+    except Exception as e:
+        print(f"Error extracting sub from token: {e}")
+        return None
+
+
+def check_user_role(conn, sub, required_role):
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT role FROM user_role WHERE cognito_sub = %s", (sub,))
+            result = cur.fetchone()
+            if result:
+                return result[0] == required_role
+            return False
+    except Exception as e:
+        print(f"Error checking user role: {e}")
+        return False
+
+
 def handler(event, context):
     conn = get_db_connection()
     if conn is None:
@@ -35,28 +68,44 @@ def handler(event, context):
         }
 
     try:
+        # Check user role - only 'company' role can access analytics
+        sub = get_user_sub_from_token(event)
+
+        if not sub:
+            return {
+                "statusCode": 401,
+                "headers": {"Access-Control-Allow-Origin": "*"},
+                "body": json.dumps({"error": "Unauthorized - no user ID found in token"}),
+            }
+
+        if not check_user_role(conn, sub, "company"):
+            return {
+                "statusCode": 403,
+                "headers": {"Access-Control-Allow-Origin": "*"},
+                "body": json.dumps({"error": "Forbidden - only company role can access analytics"}),
+            }
         with conn.cursor() as cur:
             # Get overall dashboard metrics
             overview_metrics = {}
-            
+
             # Total pools
             cur.execute("SELECT COUNT(*) FROM pool")
             overview_metrics["total_pools"] = cur.fetchone()[0]
-            
+
             # Active pools (not ended yet)
             cur.execute("SELECT COUNT(*) FROM pool WHERE end_at >= CURRENT_DATE")
             overview_metrics["active_pools"] = cur.fetchone()[0]
-            
+
             # Successful pools (reached min_quantity)
             cur.execute("""
                 SELECT COUNT(DISTINCT p.id)
                 FROM pool p
-                WHERE (SELECT COALESCE(SUM(r.quantity), 0) 
-                       FROM request r 
+                WHERE (SELECT COALESCE(SUM(r.quantity), 0)
+                       FROM request r
                        WHERE r.pool_id = p.id) >= p.min_quantity
             """)
             overview_metrics["successful_pools"] = cur.fetchone()[0]
-            
+
             # Total revenue
             cur.execute("""
                 SELECT COALESCE(SUM(r.quantity * pr.unit_price), 0)
@@ -65,40 +114,23 @@ def handler(event, context):
                 JOIN product pr ON p.product_id = pr.id
             """)
             overview_metrics["total_revenue"] = float(cur.fetchone()[0])
-            
-            # Total savings
-            cur.execute("""
-                SELECT COALESCE(SUM(
-                    CASE 
-                        WHEN (SELECT COALESCE(SUM(r2.quantity), 0) 
-                              FROM request r2 
-                              WHERE r2.pool_id = r.pool_id) >= p.min_quantity 
-                        THEN r.quantity * pr.unit_price * 0.15
-                        ELSE 0
-                    END
-                ), 0)
-                FROM request r
-                JOIN pool p ON r.pool_id = p.id
-                JOIN product pr ON p.product_id = pr.id
-            """)
-            overview_metrics["total_savings"] = float(cur.fetchone()[0])
-            
+
             # Total customers
             cur.execute("SELECT COUNT(DISTINCT email) FROM request")
             overview_metrics["total_customers"] = cur.fetchone()[0]
-            
+
             # Total products
             cur.execute("SELECT COUNT(*) FROM product")
             overview_metrics["total_products"] = cur.fetchone()[0]
-            
+
             # Total quantity sold
             cur.execute("SELECT COALESCE(SUM(quantity), 0) FROM request")
             overview_metrics["total_quantity_sold"] = int(cur.fetchone()[0])
-            
+
             # Success rate
             if overview_metrics["total_pools"] > 0:
                 overview_metrics["success_rate"] = round(
-                    (overview_metrics["successful_pools"] / overview_metrics["total_pools"]) * 100, 
+                    (overview_metrics["successful_pools"] / overview_metrics["total_pools"]) * 100,
                     2
                 )
             else:

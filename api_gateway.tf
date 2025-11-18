@@ -69,12 +69,6 @@ module "http_api" {
       filename      = "${path.module}/functions/lambda_get_analytics_pools_sales.zip"
       handler       = "lambda_get_analytics_pools_sales.handler"
     }
-    get_analytics_customers_savings = {
-      route_key     = "GET /analytics/customers/savings"
-      function_name = "get_analytics_customers_savings"
-      filename      = "${path.module}/functions/lambda_get_analytics_customers_savings.zip"
-      handler       = "lambda_get_analytics_customers_savings.handler"
-    }
     get_analytics_overview = {
       route_key     = "GET /analytics/overview"
       function_name = "get_analytics_overview"

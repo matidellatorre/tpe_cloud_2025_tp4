@@ -1,9 +1,30 @@
 let revenueChart = null;
 let successRateChart = null;
 
-document.addEventListener("DOMContentLoaded", function () {
+async function getUserRole() {
+  let role = localStorage.getItem('user_role');
+
+  if (!role && window.cognitoAuth && window.cognitoAuth.isLoggedIn()) {
+    try {
+      role = await window.cognitoAuth.fetchAndSaveUserRole();
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+    }
+  }
+
+  return role;
+}
+
+document.addEventListener("DOMContentLoaded", async function () {
   if (window.cognitoAuth && !window.cognitoAuth.isLoggedIn()) {
     window.location.href = "login.html";
+    return;
+  }
+
+  const userRole = await getUserRole();
+  if (userRole !== 'company') {
+    alert('Access denied. Analytics dashboard is only available for company users.');
+    window.location.href = "index.html";
     return;
   }
 
@@ -16,10 +37,9 @@ async function loadAnalyticsData() {
   try {
     showLoading();
 
-    const [overview, poolSales, customerSavings] = await Promise.all([
+    const [overview, poolSales] = await Promise.all([
       window.apiClient.getAnalyticsOverview(),
       window.apiClient.getAnalyticsPoolsSales(),
-      window.apiClient.getAnalyticsCustomersSavings(),
     ]);
 
     updateOverviewCards(overview);
@@ -27,11 +47,17 @@ async function loadAnalyticsData() {
     updateCharts(overview, poolSales);
 
     updateSalesTable(poolSales);
-    updateSavingsTable(customerSavings);
 
     hideLoading();
   } catch (error) {
     console.error("Error loading analytics data:", error);
+
+    if (error.status === 403 || (error.message && (error.message.includes('403') || error.message.includes('Forbidden')))) {
+      alert('Access denied. Analytics dashboard is only available for company users.');
+      window.location.href = "index.html";
+      return;
+    }
+
     showError("Error loading analytics data. Please try again.");
     hideLoading();
   }
@@ -48,9 +74,9 @@ function updateOverviewCards(overview) {
       color: "bg-green-500",
     },
     {
-      title: "Total Savings",
-      value: formatCurrency(overview.total_savings || 0),
-      icon: "💵",
+      title: "Total Pools",
+      value: overview.total_pools || 0,
+      icon: "📦",
       color: "bg-blue-500",
     },
     {
@@ -178,7 +204,7 @@ function updateSalesTable(poolSales) {
 
   if (poolSales.length === 0) {
     tbody.innerHTML =
-      '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No pool sales data available</td></tr>';
+      '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No pool sales data available</td></tr>';
     return;
   }
 
@@ -207,43 +233,6 @@ function updateSalesTable(poolSales) {
                     ${pool.reached_min_quantity ? "Success" : "Pending"}
                 </span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">${formatCurrency(
-              pool.total_savings
-            )}</td>
-        </tr>
-    `
-    )
-    .join("");
-}
-
-function updateSavingsTable(customerSavings) {
-  const tbody = document.getElementById("savings-table-body");
-
-  if (customerSavings.length === 0) {
-    tbody.innerHTML =
-      '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No customer savings data available</td></tr>';
-    return;
-  }
-
-  tbody.innerHTML = customerSavings
-    .map(
-      (customer) => `
-        <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${escapeHtml(
-              customer.email
-            )}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${
-              customer.pools_joined
-            }</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${
-              customer.total_quantity_purchased
-            }</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatCurrency(
-              customer.total_spent
-            )}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">${formatCurrency(
-              customer.total_savings
-            )}</td>
         </tr>
     `
     )
