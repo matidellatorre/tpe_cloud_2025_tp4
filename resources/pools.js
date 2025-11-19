@@ -186,7 +186,17 @@ async function loadPools() {
   try {
     const loading = document.getElementById('pools-loading');
     if (loading) loading.classList.remove('hidden');
-    const pools = await window.apiClient.getPools();
+
+    const userRole = localStorage.getItem('user_role');
+    const userEmail = localStorage.getItem('user_email');
+
+    let pools;
+    if (userRole === 'company' && userEmail) {
+      pools = await window.apiClient.getPools(userEmail);
+    } else {
+      pools = await window.apiClient.getPools();
+    }
+
     const poolsWithProducts = await Promise.all(
       pools.map(async (pool) => {
         try {
@@ -468,7 +478,15 @@ function viewPoolDetails(poolId) {
 
 async function loadProductsForForm() {
   try {
-    productsData = await window.apiClient.getProducts();
+    const userRole = localStorage.getItem('user_role');
+    const userEmail = localStorage.getItem('user_email');
+
+    if (userRole === 'company' && userEmail) {
+      productsData = await window.apiClient.getProducts(userEmail);
+    } else {
+      productsData = await window.apiClient.getProducts();
+    }
+
     const productSelect = document.getElementById('pool-product');
 
     if (!productSelect) return;

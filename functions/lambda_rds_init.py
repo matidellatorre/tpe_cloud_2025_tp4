@@ -35,6 +35,7 @@ def create_tables(conn):
         category VARCHAR(100),
         unit_price DECIMAL(12,2) NOT NULL,
         image_url VARCHAR(512),
+        email VARCHAR(254) NOT NULL,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );
@@ -82,6 +83,7 @@ def create_tables(conn):
         "CREATE INDEX IF NOT EXISTS idx_requests_pool_id ON request(pool_id);",
         "CREATE INDEX IF NOT EXISTS idx_requests_email ON request(email);",
         "CREATE INDEX IF NOT EXISTS idx_products_category ON product(category);",
+        "CREATE INDEX IF NOT EXISTS idx_products_email ON product(email);",
         "CREATE INDEX IF NOT EXISTS idx_user_role_email ON user_role(email);",
         "CREATE INDEX IF NOT EXISTS idx_user_role_sub ON user_role(cognito_sub);",
     ]

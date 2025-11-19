@@ -147,7 +147,14 @@ async function loadProducts() {
     const loading = document.getElementById('products-loading');
     if (loading) loading.classList.remove('hidden');
 
-    productsData = await window.apiClient.getProducts();
+    const userRole = localStorage.getItem('user_role');
+    const userEmail = localStorage.getItem('user_email');
+
+    if (userRole === 'company' && userEmail) {
+      productsData = await window.apiClient.getProducts(userEmail);
+    } else {
+      productsData = await window.apiClient.getProducts();
+    }
 
     if (loading) loading.classList.add('hidden');
     renderProducts();
@@ -384,7 +391,7 @@ function openCreatePoolModal(product) {
                                     Minimum Quantity <span class="text-red-500">*</span>
                                 </label>
                                 <input type="number" id="pool-capacity-from-product" required min="2" placeholder="10" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                                <p class="mt-1 text-xs text-gray-500">Minimum participants needed</p>
+                                <p class="mt-1 text-xs text-gray-500">Minimum quantity needed</p>
                             </div>
                             <div>
                                 <label for="pool-deadline-from-product" class="block text-sm font-medium text-gray-700 mb-1">

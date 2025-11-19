@@ -35,25 +35,37 @@ def handler(event, context):
         }
 
     try:
+        email_filter = None
+        if event.get("queryStringParameters"):
+            email_filter = event["queryStringParameters"].get("email")
+
         with conn.cursor() as cur:
-            cur.execute(
-                """
-                SELECT
-                    p.id,
-                    p.product_id,
-                    p.start_at,
-                    p.end_at,
-                    p.min_quantity,
-                    p.created_at,
-                    p.updated_at,
-                    p.status,
-                    COALESCE(SUM(r.quantity), 0) as joined
-                FROM pool p
-                LEFT JOIN request r ON p.id = r.pool_id
-                GROUP BY p.id, p.product_id, p.start_at, p.end_at, p.min_quantity, p.created_at, p.updated_at
-                ORDER BY p.created_at DESC
-            """
-            )
+            if email_filter:
+                cur.execute(
+                    """
+                    SELECT p.id, p.product_id, p.start_at, p.end_at, p.min_quantity, p.created_at,
+                        p.updated_at, p.status, COALESCE(SUM(r.quantity), 0) as joined
+                    FROM pool p
+                    INNER JOIN product prod ON p.product_id = prod.id
+                    LEFT JOIN request r ON p.id = r.pool_id
+                    WHERE prod.email = %s
+                    GROUP BY p.id, p.product_id, p.start_at, p.end_at, p.min_quantity, p.created_at, p.updated_at
+                    ORDER BY p.created_at DESC
+                    """,
+                    (email_filter,),
+                )
+            else:
+                cur.execute(
+                    """
+                    SELECT p.id, p.product_id, p.start_at, p.end_at, p.min_quantity, p.created_at,
+                        p.updated_at, p.status, COALESCE(SUM(r.quantity), 0) as joined
+                    FROM pool p
+                    LEFT JOIN request r ON p.id = r.pool_id
+                    GROUP BY p.id, p.product_id, p.start_at, p.end_at, p.min_quantity, p.created_at, p.updated_at
+                    ORDER BY p.created_at DESC
+                    """
+                )
+
             pools = cur.fetchall()
             pool_list = [
                 {

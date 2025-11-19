@@ -46,6 +46,20 @@ def get_user_sub_from_token(event):
         return None
 
 
+def get_user_email_from_token(event):
+    try:
+        request_context = event.get("requestContext", {})
+        authorizer = request_context.get("authorizer", {})
+        claims = authorizer.get("claims", {})
+        if not claims:
+            jwt = authorizer.get("jwt", {})
+            claims = jwt.get("claims", {})
+        return claims.get("email")
+    except Exception as e:
+        print(f"Error extracting email from token: {e}")
+        return None
+
+
 def check_user_role(conn, sub, required_role):
     try:
         with conn.cursor() as cur:
@@ -57,6 +71,19 @@ def check_user_role(conn, sub, required_role):
     except Exception as e:
         print(f"Error checking user role: {e}")
         return False
+
+
+def get_user_email_from_db(conn, sub):
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT email FROM user_role WHERE cognito_sub = %s", (sub,))
+            result = cur.fetchone()
+            if result:
+                return result[0]
+            return None
+    except Exception as e:
+        print(f"Error getting user email: {e}")
+        return None
 
 
 def handler(event, context):
@@ -83,6 +110,18 @@ def handler(event, context):
                 "headers": {"Access-Control-Allow-Origin": "*"},
                 "body": json.dumps({"error": "Forbidden - only company role can access analytics"}),
             }
+
+        user_email = get_user_email_from_token(event)
+        if not user_email:
+            user_email = get_user_email_from_db(conn, sub)
+
+        if not user_email:
+            return {
+                "statusCode": 400,
+                "headers": {"Access-Control-Allow-Origin": "*"},
+                "body": json.dumps({"error": "Could not determine user email"}),
+            }
+
         with conn.cursor() as cur:
             cur.execute(
                 """
@@ -103,9 +142,11 @@ def handler(event, context):
                 FROM pool p
                 JOIN product pr ON p.product_id = pr.id
                 LEFT JOIN request r ON p.id = r.pool_id
+                WHERE pr.email = %s
                 GROUP BY p.id, pr.name, pr.unit_price, p.min_quantity, p.start_at, p.end_at
                 ORDER BY p.created_at DESC
-            """
+                """,
+                (user_email,)
             )
             pools = cur.fetchall()
 

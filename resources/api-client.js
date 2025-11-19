@@ -80,7 +80,11 @@ class ApiClient {
       throw error;
     }
   }
-  async getProducts() {
+  async getProducts(email = null) {
+    if (email) {
+      const queryParams = new URLSearchParams({ email });
+      return this.request(`/products?${queryParams.toString()}`);
+    }
     return this.request('/products');
   }
 
@@ -101,7 +105,11 @@ class ApiClient {
     });
   }
 
-  async getPools() {
+  async getPools(email = null) {
+    if (email) {
+      const queryParams = new URLSearchParams({ email });
+      return this.request(`/pools?${queryParams.toString()}`);
+    }
     return this.request('/pools');
   }
 

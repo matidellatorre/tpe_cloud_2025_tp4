@@ -35,8 +35,19 @@ def handler(event, context):
         }
 
     try:
+        email_filter = None
+        if event.get("queryStringParameters"):
+            email_filter = event["queryStringParameters"].get("email")
+
         with conn.cursor() as cur:
-            cur.execute("SELECT id, name, description, category, unit_price, image_url, created_at, updated_at FROM product")
+            if email_filter:
+                cur.execute(
+                    "SELECT id, name, description, category, unit_price, image_url, email, created_at, updated_at FROM product WHERE email = %s",
+                    (email_filter,),
+                )
+            else:
+                cur.execute("SELECT id, name, description, category, unit_price, image_url, email, created_at, updated_at FROM product")
+
             products = cur.fetchall()
             product_list = [
                 {
@@ -46,8 +57,9 @@ def handler(event, context):
                     "category": row[3],
                     "unit_price": float(row[4]) if row[4] is not None else None,
                     "image_url": row[5],
-                    "created_at": row[6].isoformat(),
-                    "updated_at": row[7].isoformat(),
+                    "email": row[6],
+                    "created_at": row[7].isoformat(),
+                    "updated_at": row[8].isoformat(),
                 }
                 for row in products
             ]
