@@ -15,6 +15,11 @@ for file in "$FUNCTIONS_PATH"/*.py; do
     basename="${filename%.py}"
     zip_path="$FUNCTIONS_PATH/${basename}.zip"
 
+    if [ -f "$zip_path" ] && [ ! "$file" -nt "$zip_path" ]; then
+        echo "Skipping: $file (zip is up to date)"
+        continue
+    fi
+
     echo "Processing: $file"
 
     temp_dir=$(mktemp -d)

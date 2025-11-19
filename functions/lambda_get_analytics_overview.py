@@ -89,7 +89,7 @@ def handler(event, context):
             cur.execute("SELECT COUNT(*) FROM pool")
             overview_metrics["total_pools"] = cur.fetchone()[0]
 
-            cur.execute("SELECT COUNT(*) FROM pool WHERE status = 'active'")
+            cur.execute("SELECT COUNT(*) FROM pool WHERE status = 'open'")
             overview_metrics["active_pools"] = cur.fetchone()[0]
 
             cur.execute(
