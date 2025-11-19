@@ -81,23 +81,18 @@
 
           await window.cognitoAuth.loginWithPassword(email, password);
 
-          try {
-            errorDiv.classList.add('hidden');
-            await window.cognitoAuth.loginWithPassword(email, password);
+          localStorage.setItem('user_email', email);
 
-            localStorage.setItem('user_email', email);
+          await window.cognitoAuth.fetchAndSaveUserRole();
 
-            window.location.href = 'index.html';
-          } catch (error) {
-            loginBtn.disabled = false;
-            loginText.classList.remove('hidden');
-            loginLoading.classList.add('hidden');
-            errorDiv.textContent = error.message || 'Error signing in';
-            errorDiv.classList.remove('hidden');
-          }
+          const redirectPath = localStorage.getItem('redirect_after_login') || 'index.html';
+          localStorage.removeItem('redirect_after_login');
 
-          window.location.href = 'index.html';
+          window.location.href = redirectPath;
         } catch (error) {
+          loginBtn.disabled = false;
+          loginText.classList.remove('hidden');
+          loginLoading.classList.add('hidden');
           errorDiv.textContent = error.message || 'Error signing in';
           errorDiv.classList.remove('hidden');
         }
