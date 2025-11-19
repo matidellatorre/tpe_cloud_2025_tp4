@@ -77,6 +77,26 @@ def check_and_notify_if_full(conn, pool_id):
                 print(f"Notificación de cierre inmediato enviada para pool {pool_id}.")
 
                 conn.commit()
+            else:
+                percentage = (total_joined / min_quantity) * 100 if min_quantity > 0 else 0
+                
+                if percentage >= 85:
+                    print(f"Pool {pool_id} está al {percentage:.1f}% de su capacidad ({total_joined}/{min_quantity})")
+                    
+                    cur.execute("SELECT email, quantity FROM request WHERE pool_id = %s", (pool_id,))
+                    participants = cur.fetchall()
+                    participant_list = [f"{email} ({qty}u)" for email, qty in participants]
+                    
+                    remaining = min_quantity - total_joined
+                    subject = f"⚠️ AVISO: El pool para '{product_name}' está por cerrar"
+                    message_body = (
+                        f"¡Atención!\n\n"
+                        f"El pool de compra para '{product_name}' (ID: {pool_id}) está al {percentage:.1f}% de su capacidad.\n\n"    
+                        f"¡Únete ahora antes de que se cierre!\n"
+                    )
+                    
+                    sns_client.publish(TopicArn=sns_topic_arn, Message=message_body, Subject=subject)
+                    print(f"Notificación de advertencia (85%+) enviada para pool {pool_id}.")
 
     except (Exception, psycopg2.Error) as e:
         print(f"Error en check_and_notify_if_full: {e}")
