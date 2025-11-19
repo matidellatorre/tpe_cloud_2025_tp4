@@ -185,32 +185,36 @@ function createProductCard(product) {
   const imageUrl =
     product.image_url || "https://placehold.co/600x400?text=No+Image";
   return `
-        <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200">
+        <div class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-purple-100 group">
             <!-- Product Image -->
-            <div class="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+            <div class="h-52 bg-gradient-to-br from-purple-900 via-gray-900 to-gray-800 flex items-center justify-center overflow-hidden relative">
                 <img src="${imageUrl}" alt="${
     product.name
-  }" class="w-full h-full object-cover">
+  }" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
             </div>
             
-            <div class="p-4">
+            <div class="p-5">
                 <!-- Product Name -->
-                <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2 h-14">${
+                <h3 class="text-xl font-black text-gray-900 mb-2 line-clamp-1">${
                   product.name
                 }</h3>
                 
                 <!-- Description -->
-                <p class="text-sm text-gray-500 mb-3 line-clamp-2 h-10">${
+                <p class="text-sm text-gray-600 mb-3 line-clamp-1 min-h-[1.25rem]">${
                   product.description || "No description available"
                 }</p>
                 
                 <!-- Price -->
-                <div class="flex justify-between items-center mb-3 pb-3 border-b border-gray-200">
-                    <div>
-                        <span class="text-2xl font-bold text-gray-900">$${product.unit_price.toFixed(
-                          2
-                        )}</span>
-                        <span class="text-sm text-gray-500 ml-2">per unit</span>
+                <div class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-3 mb-4">
+                    <div class="flex items-baseline justify-between">
+                        <div>
+                            <span class="text-3xl font-black bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">$${product.unit_price.toFixed(
+                              2
+                            )}</span>
+                            <span class="text-xs text-purple-600 font-semibold ml-1">/unit</span>
+                        </div>
+                        <span class="text-xs text-purple-600 font-medium">Save with pools!</span>
                     </div>
                 </div>
                 
@@ -219,27 +223,31 @@ function createProductCard(product) {
                     ${
                       localStorage.getItem("user_role") === "company"
                         ? `
-                    <button onclick="createPool(${product.id})" class="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-md">
+                    <button onclick="createPool(${product.id})" class="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-3 py-2.5 rounded-lg text-sm font-bold transition-all shadow-md hover:shadow-xl hover:-translate-y-0.5">
                         Create Pool
                     </button>
-                    `
-                        : ""
-                    }
-                    <button onclick="viewProductDetails(${
-                      product.id
-                    })" class="${
-    localStorage.getItem("user_role") === "company" ? "" : "flex-1"
-  } px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                    <button onclick="viewProductDetails(${product.id})" class="px-3 py-2.5 border-2 border-purple-200 rounded-lg text-purple-700 hover:bg-purple-50 hover:border-purple-400 transition-all">
                         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                     </button>
-                    <button onclick="deleteProduct(${product.id}, '${product.name}')" class="px-4 py-2 border border-gray-300 rounded-lg text-red-700 hover:bg-red-50 transition-colors">
+                    <button onclick="deleteProduct(${product.id}, '${product.name}')" class="px-3 py-2.5 border-2 border-red-200 rounded-lg text-red-600 hover:bg-red-50 hover:border-red-400 transition-all">
                         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                     </button>
+                    `
+                        : `
+                    <button onclick="viewProductDetails(${product.id})" class="flex-1 bg-gradient-to-r from-purple-600 via-purple-700 to-purple-800 hover:from-purple-700 hover:via-purple-800 hover:to-purple-900 text-white px-4 py-3 rounded-lg text-sm font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <span>View Details</span>
+                    </button>
+                    `
+                    }
                 </div>
             </div>
         </div>
@@ -254,17 +262,115 @@ function viewProductDetails(productId) {
 }
 
 async function deleteProduct(productId, productName) {
-    if (confirm(`Are you sure you want to delete "${productName}"?`)) {
-        try {
-            await window.apiClient.deleteProduct(productId);
-            showNotification('Product deleted successfully!');
-            // Reload products to reflect the change
-            await loadProducts();
-        } catch (error) {
-            console.error('Error deleting product:', error);
-            showNotification(error.message || 'Error deleting product. Please try again.', 'error');
-        }
+  openDeleteProductModal(productId, productName);
+}
+
+function openDeleteProductModal(productId, productName) {
+  const modalHTML = `
+    <div id="delete-product-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+        <!-- Header with Warning Icon -->
+        <div class="px-6 py-5 border-b border-gray-200">
+          <div class="flex items-center space-x-3">
+            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center shadow-lg">
+              <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-xl font-bold text-gray-900">Delete Product</h3>
+              <p class="text-sm text-gray-500">This action cannot be undone</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="px-6 py-5">
+          <div class="bg-red-50 border-l-4 border-red-500 rounded-lg p-4 mb-4">
+            <p class="text-sm text-gray-700">
+              Are you sure you want to delete 
+              <span class="font-bold text-gray-900">"${productName}"</span>?
+            </p>
+            <p class="text-xs text-gray-600 mt-2">
+              All associated pools and data will be permanently removed.
+            </p>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="px-6 py-4 bg-gray-50 rounded-b-2xl flex space-x-3">
+          <button 
+            id="cancel-delete-btn" 
+            type="button"
+            class="flex-1 px-4 py-2.5 border-2 border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-100 hover:border-gray-400 transition-all">
+            Cancel
+          </button>
+          <button 
+            id="confirm-delete-btn" 
+            type="button"
+            class="flex-1 px-4 py-2.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg font-bold shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            <span id="delete-btn-text">Delete Product</span>
+            <div id="delete-btn-loading" class="hidden">
+              <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML("beforeend", modalHTML);
+  setupDeleteProductModalEvents(productId, productName);
+}
+
+function setupDeleteProductModalEvents(productId, productName) {
+  const modal = document.getElementById("delete-product-modal");
+  const cancelBtn = document.getElementById("cancel-delete-btn");
+  const confirmBtn = document.getElementById("confirm-delete-btn");
+
+  cancelBtn.addEventListener("click", closeDeleteProductModal);
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      closeDeleteProductModal();
     }
+  });
+
+  confirmBtn.addEventListener("click", async () => {
+    const deleteText = document.getElementById("delete-btn-text");
+    const deleteLoading = document.getElementById("delete-btn-loading");
+
+    confirmBtn.disabled = true;
+    deleteText.classList.add("hidden");
+    deleteLoading.classList.remove("hidden");
+
+    try {
+      await window.apiClient.deleteProduct(productId);
+      closeDeleteProductModal();
+      showNotification("Product deleted successfully!");
+      await loadProducts();
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      showNotification(
+        error.message || "Error deleting product. Please try again.",
+        "error"
+      );
+    } finally {
+      confirmBtn.disabled = false;
+      deleteText.classList.remove("hidden");
+      deleteLoading.classList.add("hidden");
+    }
+  });
+}
+
+function closeDeleteProductModal() {
+  const modal = document.getElementById("delete-product-modal");
+  if (modal) {
+    modal.remove();
+  }
 }
 
 function createPool(productId) {

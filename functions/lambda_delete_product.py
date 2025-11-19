@@ -43,25 +43,6 @@ def handler(event, context):
     try:
         product_id = event["pathParameters"]["id"]
         with conn.cursor() as cur:
-            # Check if there are any active pools for this product
-            cur.execute(
-                "SELECT COUNT(*) FROM pool WHERE product_id = %s",
-                (product_id,),
-            )
-            pool_count = cur.fetchone()[0]
-
-            if pool_count > 0:
-                return {
-                    "statusCode": 409,  # Conflict
-                    "headers": HEADERS,
-                    "body": json.dumps(
-                        {
-                            "error": "Cannot delete product with active pools. Please remove associated pools first."
-                        }
-                    ),
-                }
-
-            # If no active pools, proceed with deletion
             cur.execute("DELETE FROM product WHERE id = %s RETURNING id", (product_id,))
             deleted_id = cur.fetchone()
             conn.commit()

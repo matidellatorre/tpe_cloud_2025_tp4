@@ -53,8 +53,9 @@ function displayPoolDetails() {
   document.getElementById("pool-product-name").textContent = poolProduct.name;
   document.getElementById("pool-product-description").textContent =
     poolProduct.description || "No description available";
-  document.getElementById("pool-unit-price").textContent =
-    `$${poolProduct.unit_price.toFixed(2)}`;
+  document.getElementById(
+    "pool-unit-price"
+  ).textContent = `$${poolProduct.unit_price.toFixed(2)}`;
 
   const today = new Date();
   const deadline = new Date(currentPool.end_at);
@@ -72,22 +73,26 @@ function displayPoolDetails() {
     currentPool.min_quantity;
   document.getElementById("pool-joined").textContent = joined;
   document.getElementById("pool-remaining").textContent = remaining;
-  document.getElementById("pool-dates").textContent =
-    `${formatDate(currentPool.start_at)} - ${formatDate(currentPool.end_at)}`;
+  document.getElementById("pool-dates").textContent = `${formatDate(
+    currentPool.start_at
+  )} - ${formatDate(currentPool.end_at)}`;
 
   const progress = Math.min(100, (joined / currentPool.min_quantity) * 100);
   document.getElementById("pool-progress-bar").style.width = `${progress}%`;
-  document.getElementById("pool-progress-text").textContent =
-    `${joined}/${currentPool.min_quantity} participants`;
+  document.getElementById(
+    "pool-progress-text"
+  ).textContent = `${joined}/${currentPool.min_quantity} participants`;
 
   const joinBtn = document.getElementById("join-pool-btn");
   const userRole = localStorage.getItem("user_role");
   const canJoinPool = userRole === "client";
 
-  if (currentPool.status !== "open" || daysRemaining < 0 || !canJoinPool) {
-    joinBtn.textContent = canJoinPool
-      ? statusInfo.text
-      : "Only clients can join";
+  // Hide join button for companies
+  if (!canJoinPool) {
+    joinBtn.classList.add("hidden");
+  } else if (currentPool.status !== "open" || daysRemaining < 0) {
+    // For clients, show disabled button if pool is closed/expired
+    joinBtn.textContent = statusInfo.text;
     joinBtn.disabled = true;
     joinBtn.className =
       "bg-gray-300 text-gray-500 px-6 py-3 rounded-lg font-medium cursor-not-allowed";
@@ -135,7 +140,7 @@ function createRequestCard(request) {
                           request.email
                         }</p>
                         <p class="text-sm text-gray-500">Requested ${formatDate(
-                          request.created_at,
+                          request.created_at
                         )}</p>
                     </div>
                 </div>
@@ -179,7 +184,7 @@ function openJoinPoolModal(pool) {
                                       poolProduct.name
                                     }</p>
                                     <p class="text-sm text-gray-600">$${poolProduct.unit_price.toFixed(
-                                      2,
+                                      2
                                     )} per unit</p>
                                 </div>
                                 <div class="text-right">
@@ -286,8 +291,9 @@ function setupJoinPoolModalEvents(pool) {
       document.getElementById("pool-remaining").textContent = remaining;
       const progress = Math.min(100, (joined / currentPool.min_quantity) * 100);
       document.getElementById("pool-progress-bar").style.width = `${progress}%`;
-      document.getElementById("pool-progress-text").textContent =
-        `${joined}/${currentPool.min_quantity} participants`;
+      document.getElementById(
+        "pool-progress-text"
+      ).textContent = `${joined}/${currentPool.min_quantity} participants`;
       if (joined >= currentPool.min_quantity) {
         const joinBtn = document.getElementById("join-pool-btn");
         joinBtn.textContent = "Pool Complete";

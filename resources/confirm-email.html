@@ -53,9 +53,15 @@
         <div>
           <button
             type="submit"
-            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            id="confirm-btn"
+            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Confirm Email
+            <span id="confirm-text">Confirm Email</span>
+            <div id="confirm-loading" class="hidden ml-2">
+              <div
+                class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"
+              ></div>
+            </div>
           </button>
         </div>
 
@@ -108,10 +114,16 @@
           const code = document.getElementById("code").value;
           const errorDiv = document.getElementById("error-message");
           const successDiv = document.getElementById("success-message");
+          const confirmBtn = document.getElementById("confirm-btn");
+          const confirmText = document.getElementById("confirm-text");
+          const confirmLoading = document.getElementById("confirm-loading");
 
           try {
             errorDiv.classList.add("hidden");
             successDiv.classList.add("hidden");
+            confirmBtn.disabled = true;
+            confirmText.classList.add("hidden");
+            confirmLoading.classList.remove("hidden");
 
             await window.cognitoAuth.confirmSignup(email, code);
 
@@ -145,18 +157,16 @@
 
             localStorage.setItem("user_email", email);
 
-            successDiv.textContent =
-              "Email confirmed successfully. Redirecting...";
-            successDiv.classList.remove("hidden");
-
             localStorage.removeItem("pending_email");
             localStorage.removeItem("pending_role");
             localStorage.removeItem("pending_password");
 
-            setTimeout(() => {
-              window.location.href = "index.html";
-            }, 2000);
+            // Redirect immediately with loading still showing
+            window.location.href = "index.html";
           } catch (error) {
+            confirmBtn.disabled = false;
+            confirmText.classList.remove("hidden");
+            confirmLoading.classList.add("hidden");
             errorDiv.textContent = error.message || "Error confirming email";
             errorDiv.classList.remove("hidden");
           }

@@ -58,9 +58,15 @@
         <div>
           <button
             type="submit"
-            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            id="login-btn"
+            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign In
+            <span id="login-text">Sign In</span>
+            <div id="login-loading" class="hidden ml-2">
+              <div
+                class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"
+              ></div>
+            </div>
           </button>
         </div>
 
@@ -80,9 +86,16 @@
           const email = document.getElementById("email").value;
           const password = document.getElementById("password").value;
           const errorDiv = document.getElementById("error-message");
+          const loginBtn = document.getElementById("login-btn");
+          const loginText = document.getElementById("login-text");
+          const loginLoading = document.getElementById("login-loading");
 
           try {
             errorDiv.classList.add("hidden");
+            loginBtn.disabled = true;
+            loginText.classList.add("hidden");
+            loginLoading.classList.remove("hidden");
+
             await window.cognitoAuth.loginWithPassword(email, password);
 
             // Save user email in localStorage
@@ -99,6 +112,9 @@
             // Redirect to index after successful login
             window.location.href = "index.html";
           } catch (error) {
+            loginBtn.disabled = false;
+            loginText.classList.remove("hidden");
+            loginLoading.classList.add("hidden");
             errorDiv.textContent = error.message || "Error signing in";
             errorDiv.classList.remove("hidden");
           }

@@ -221,7 +221,7 @@ async function loadPools() {
             },
           };
         }
-      }),
+      })
     );
 
     poolsData = poolsWithProducts;
@@ -273,7 +273,9 @@ function createPoolCard(pool) {
                       pool.product?.description || "Pool description"
                     }</p>
                 </div>
-                <span class="px-3 py-1 rounded-full text-xs font-medium ${statusInfo.classes} capitalize ml-2">
+                <span class="px-3 py-1 rounded-full text-xs font-medium ${
+                  statusInfo.classes
+                } capitalize ml-2">
                     ${statusInfo.text}
                 </span>
             </div>
@@ -282,7 +284,7 @@ function createPoolCard(pool) {
                 <div class="flex justify-between items-center mb-2">
                     <div>
                         <span class="text-2xl font-bold text-gray-900">$${price.toFixed(
-                          2,
+                          2
                         )}</span>
                         <span class="text-sm text-gray-500 ml-2">per unit</span>
                     </div>
@@ -295,7 +297,17 @@ function createPoolCard(pool) {
                     <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <span class="${pool.status === "open" && daysRemaining < 0 ? "text-red-600 font-medium" : ""}">${pool.status === "open" ? (daysRemaining >= 0 ? `${daysRemaining} days left` : "Expired") : "Ended"}</span>
+                    <span class="${
+                      pool.status === "open" && daysRemaining < 0
+                        ? "text-red-600 font-medium"
+                        : ""
+                    }">${
+    pool.status === "open"
+      ? daysRemaining >= 0
+        ? `${daysRemaining} days left`
+        : "Expired"
+      : "Ended"
+  }</span>
                 </div>
                 <div class="text-xs text-gray-500">
                     ${formatDate(pool.start_at)} - ${formatDate(pool.end_at)}
@@ -304,25 +316,39 @@ function createPoolCard(pool) {
 
             <div class="flex space-x-2">
                 ${
-                  pool.status !== "open" || daysRemaining < 0 || !canJoinPool
-                    ? `
-                    <button disabled class="flex-1 bg-gray-300 text-gray-500 px-6 py-3 rounded-lg font-medium cursor-not-allowed">
-                        ${canJoinPool ? statusInfo.text : "Only clients can join"}
+                  canJoinPool
+                    ? // Clients see join button or disabled status
+                      pool.status !== "open" || daysRemaining < 0
+                      ? `
+                    <button disabled class="flex-1 bg-gray-300 text-gray-500 rounded-lg font-medium cursor-not-allowed">
+                        ${statusInfo.text}
+                    </button>
+                    <button onclick="viewPoolDetails(${pool.id})" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
                     </button>`
-                    : `
+                      : `
                     <button onclick="joinPool(${pool.id})" class="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-md">
                         Join Pool
                     </button>
-                `
+                    <button onclick="viewPoolDetails(${pool.id})" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </button>`
+                    : // Companies see only full-width view details button
+                      `
+                    <button onclick="viewPoolDetails(${pool.id})" class="flex-1 bg-gradient-to-r from-purple-600 via-purple-700 to-purple-800 hover:from-purple-700 hover:via-purple-800 hover:to-purple-900 text-white px-4 py-3 rounded-lg text-sm font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <span>View Details</span>
+                    </button>`
                 }
-                <button onclick="viewPoolDetails(${
-                  pool.id
-                })" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                </button>
             </div>
         </div>
     `;
@@ -493,7 +519,7 @@ async function loadProductsForForm() {
       const option = document.createElement("option");
       option.value = product.id;
       option.textContent = `${product.name} - $${product.unit_price.toFixed(
-        2,
+        2
       )}`;
       productSelect.appendChild(option);
     });
