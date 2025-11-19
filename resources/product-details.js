@@ -1,10 +1,10 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const mobileMenuButton = document.getElementById("mobile-menu-button");
-  const mobileMenu = document.getElementById("mobile-menu");
+document.addEventListener('DOMContentLoaded', function () {
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
 
   if (mobileMenuButton) {
-    mobileMenuButton.addEventListener("click", function () {
-      mobileMenu.classList.toggle("hidden");
+    mobileMenuButton.addEventListener('click', function () {
+      mobileMenu.classList.toggle('hidden');
     });
   }
   loadProductDetails();
@@ -16,7 +16,7 @@ let relatedPools = [];
 async function loadProductDetails() {
   try {
     const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get("id");
+    const productId = urlParams.get('id');
 
     if (!productId) {
       showError();
@@ -31,33 +31,26 @@ async function loadProductDetails() {
 }
 
 function displayProductDetails(product) {
-  document.getElementById("product-loading").classList.add("hidden");
-  document.getElementById("product-details").classList.remove("hidden");
+  document.getElementById('product-loading').classList.add('hidden');
+  document.getElementById('product-details').classList.remove('hidden');
 
-  const imageUrl =
-    product.image_url || "https://placehold.co/600x400?text=No+Image";
-  document.getElementById("product-image").src = imageUrl;
-  document.getElementById("product-image").alt = product.name;
-  document.getElementById("product-name").textContent = product.name;
-  document.getElementById("product-description").textContent =
-    product.description || "No description available";
-  document.getElementById(
-    "product-price"
-  ).textContent = `$${product.unit_price.toFixed(2)}`;
+  const imageUrl = product.image_url || 'https://placehold.co/600x400?text=No+Image';
+  document.getElementById('product-image').src = imageUrl;
+  document.getElementById('product-image').alt = product.name;
+  document.getElementById('product-name').textContent = product.name;
+  document.getElementById('product-description').textContent = product.description || 'No description available';
+  document.getElementById('product-price').textContent = `$${product.unit_price.toFixed(2)}`;
 
-  // Show appropriate button based on user role
-  const createPoolBtn = document.getElementById("create-pool-btn");
-  const backToProductsBtn = document.getElementById("back-to-products-btn");
-  const userRole = localStorage.getItem("user_role");
+  const createPoolBtn = document.getElementById('create-pool-btn');
+  const backToProductsBtn = document.getElementById('back-to-products-btn');
+  const userRole = localStorage.getItem('user_role');
 
-  if (userRole === "company") {
-    // Company users see Create Pool button
-    if (createPoolBtn) createPoolBtn.classList.remove("hidden");
-    if (backToProductsBtn) backToProductsBtn.classList.add("hidden");
+  if (userRole === 'company') {
+    if (createPoolBtn) createPoolBtn.classList.remove('hidden');
+    if (backToProductsBtn) backToProductsBtn.classList.add('hidden');
   } else {
-    // Client users see Back to Products button
-    if (createPoolBtn) createPoolBtn.classList.add("hidden");
-    if (backToProductsBtn) backToProductsBtn.classList.remove("hidden");
+    if (createPoolBtn) createPoolBtn.classList.add('hidden');
+    if (backToProductsBtn) backToProductsBtn.classList.remove('hidden');
   }
 }
 
@@ -71,40 +64,38 @@ async function loadRelatedPools(productId) {
 }
 
 function displayRelatedPools() {
-  const container = document.getElementById("related-pools");
-  const noPools = document.getElementById("no-pools");
+  const container = document.getElementById('related-pools');
+  const noPools = document.getElementById('no-pools');
 
   if (relatedPools.length === 0) {
-    container.innerHTML = "";
-    noPools.classList.remove("hidden");
+    container.innerHTML = '';
+    noPools.classList.remove('hidden');
     return;
   }
 
-  noPools.classList.add("hidden");
-  container.innerHTML = relatedPools
-    .map((pool) => createPoolCard(pool))
-    .join("");
+  noPools.classList.add('hidden');
+  container.innerHTML = relatedPools.map((pool) => createPoolCard(pool)).join('');
 }
 
 function getStatusInfo(status) {
   switch (status) {
-    case "open":
-      return { text: "Active", classes: "bg-green-100 text-green-800" };
-    case "success":
-      return { text: "Completed", classes: "bg-blue-100 text-blue-800" };
-    case "failed":
-      return { text: "Closed", classes: "bg-red-100 text-red-800" };
+    case 'open':
+      return { text: 'Active', classes: 'bg-green-100 text-green-800' };
+    case 'success':
+      return { text: 'Completed', classes: 'bg-blue-100 text-blue-800' };
+    case 'failed':
+      return { text: 'Closed', classes: 'bg-red-100 text-red-800' };
     default:
-      return { text: status, classes: "bg-gray-100 text-gray-800" };
+      return { text: status, classes: 'bg-gray-100 text-gray-800' };
   }
 }
 
 function formatDate(dateString) {
   const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
   });
 }
 
@@ -117,15 +108,13 @@ function createPoolCard(pool) {
   const daysRemaining = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
   const statusInfo = getStatusInfo(pool.status);
 
-  const userRole = localStorage.getItem("user_role");
-  const canJoinPool = userRole === "client";
+  const userRole = localStorage.getItem('user_role');
+  const canJoinPool = userRole === 'client';
 
   return `
         <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-6 border border-gray-200">
             <div class="flex justify-end items-start mb-4">
-                <span class="px-3 py-1 rounded-full text-xs font-medium ${
-                  statusInfo.classes
-                } capitalize ml-2">
+                <span class="px-3 py-1 rounded-full text-xs font-medium ${statusInfo.classes} capitalize ml-2">
                     ${statusInfo.text}
                 </span>
             </div>
@@ -133,9 +122,7 @@ function createPoolCard(pool) {
             <div class="mb-4 bg-purple-50 rounded-lg p-4">
                 <div class="flex justify-between items-center mb-2">
                     <div>
-                        <span class="text-2xl font-bold text-gray-900">$${price.toFixed(
-                          2
-                        )}</span>
+                        <span class="text-2xl font-bold text-gray-900">$${price.toFixed(2)}</span>
                         <span class="text-sm text-gray-500 ml-2">per unit</span>
                     </div>
                 </div>
@@ -147,17 +134,7 @@ function createPoolCard(pool) {
                     <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <span class="${
-                      pool.status === "open" && daysRemaining < 0
-                        ? "text-red-600 font-medium"
-                        : ""
-                    }">${
-    pool.status === "open"
-      ? daysRemaining >= 0
-        ? `${daysRemaining} days left`
-        : "Expired"
-      : "Ended"
-  }</span>
+                    <span class="${pool.status === 'open' && daysRemaining < 0 ? 'text-red-600 font-medium' : ''}">${pool.status === 'open' ? (daysRemaining >= 0 ? `${daysRemaining} days left` : 'Expired') : 'Ended'}</span>
                 </div>
                 <div class="text-xs text-gray-500">
                     ${formatDate(pool.start_at)} - ${formatDate(pool.end_at)}
@@ -167,8 +144,8 @@ function createPoolCard(pool) {
             <div class="flex space-x-2">
                 ${
                   canJoinPool
-                    ? // Clients see join button or disabled status
-                      pool.status !== "open" || daysRemaining < 0
+                    ?
+                      pool.status !== 'open' || daysRemaining < 0
                       ? `
                     <button disabled class="flex-1 bg-gray-300 text-gray-500 rounded-lg font-medium cursor-not-allowed">
                         ${statusInfo.text}
@@ -189,7 +166,7 @@ function createPoolCard(pool) {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                     </button>`
-                    : // Companies see only full-width view details button
+                    :
                       `
                     <button onclick="viewPoolDetails(${pool.id})" class="flex-1 bg-gradient-to-r from-purple-600 via-purple-700 to-purple-800 hover:from-purple-700 hover:via-purple-800 hover:to-purple-900 text-white px-4 py-3 rounded-lg text-sm font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 flex items-center justify-center space-x-2">
                         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -225,24 +202,16 @@ function openJoinPoolModal(pool) {
                 </div>
                 <form id="join-pool-form" class="px-6 py-4">
                     <div class="space-y-4">
-                        <!-- Pool Info Display -->
                         <div class="bg-purple-50 rounded-lg p-4 border border-purple-200">
                             <div class="flex justify-between items-start">
                                 <div>
                                     <p class="text-sm text-purple-600 font-medium">Pool for:</p>
-                                    <p class="font-bold text-gray-900">${
-                                      pool.product?.name || currentProduct.name
-                                    }</p>
-                                    <p class="text-sm text-gray-600">$${
-                                      pool.product?.unit_price?.toFixed(2) ||
-                                      currentProduct.unit_price.toFixed(2)
-                                    } per unit</p>
+                                    <p class="font-bold text-gray-900">${pool.product?.name || currentProduct.name}</p>
+                                    <p class="text-sm text-gray-600">$${pool.product?.unit_price?.toFixed(2) || currentProduct.unit_price.toFixed(2)} per unit</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="text-sm text-purple-600">Minimum:</p>
-                                    <p class="text-lg font-bold text-purple-600">${
-                                      pool.min_quantity
-                                    } units</p>
+                                    <p class="text-lg font-bold text-purple-600">${pool.min_quantity} units</p>
                                 </div>
                             </div>
                         </div>
@@ -279,49 +248,49 @@ function openJoinPoolModal(pool) {
             </div>
         </div>
     `;
-  document.body.insertAdjacentHTML("beforeend", modalHTML);
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
   setupJoinPoolModalEvents(pool);
 }
 
 function setupJoinPoolModalEvents(pool) {
-  const modal = document.getElementById("join-pool-modal");
-  const closeBtn = document.getElementById("close-join-modal-btn");
-  const cancelBtn = document.getElementById("cancel-join-modal-btn");
-  const form = document.getElementById("join-pool-form");
-  const emailInput = document.getElementById("join-email");
-  const userEmail = localStorage.getItem("user_email");
+  const modal = document.getElementById('join-pool-modal');
+  const closeBtn = document.getElementById('close-join-modal-btn');
+  const cancelBtn = document.getElementById('cancel-join-modal-btn');
+  const form = document.getElementById('join-pool-form');
+  const emailInput = document.getElementById('join-email');
+  const userEmail = localStorage.getItem('user_email');
 
   if (userEmail) {
     emailInput.value = userEmail;
   }
-  closeBtn.addEventListener("click", closeJoinPoolModal);
-  cancelBtn.addEventListener("click", closeJoinPoolModal);
-  modal.addEventListener("click", (e) => {
+  closeBtn.addEventListener('click', closeJoinPoolModal);
+  cancelBtn.addEventListener('click', closeJoinPoolModal);
+  modal.addEventListener('click', (e) => {
     if (e.target === modal) {
       closeJoinPoolModal();
     }
   });
-  form.addEventListener("submit", async (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const submitBtn = document.getElementById("submit-join-btn");
-    const submitText = document.getElementById("submit-join-text");
-    const submitLoading = document.getElementById("submit-join-loading");
+    const submitBtn = document.getElementById('submit-join-btn');
+    const submitText = document.getElementById('submit-join-text');
+    const submitLoading = document.getElementById('submit-join-loading');
 
-    const email = document.getElementById("join-email").value;
-    const quantity = document.getElementById("join-quantity").value;
+    const email = document.getElementById('join-email').value;
+    const quantity = document.getElementById('join-quantity').value;
     if (!email) {
-      showNotification("Please enter your email", "error");
+      showNotification('Please enter your email', 'error');
       return;
     }
 
     if (!quantity || quantity < 1) {
-      showNotification("Please enter a valid quantity", "error");
+      showNotification('Please enter a valid quantity', 'error');
       return;
     }
     submitBtn.disabled = true;
-    submitText.classList.add("hidden");
-    submitLoading.classList.remove("hidden");
+    submitText.classList.add('hidden');
+    submitLoading.classList.remove('hidden');
 
     const requestData = {
       email: email,
@@ -331,20 +300,20 @@ function setupJoinPoolModalEvents(pool) {
     try {
       await window.apiClient.createPoolRequest(pool.id, requestData);
       closeJoinPoolModal();
-      showNotification("Successfully joined pool!", "success");
-      await loadRelatedPools(currentProduct.id); // Reload pools
+      showNotification('Successfully joined pool!', 'success');
+      await loadRelatedPools(currentProduct.id);
     } catch (error) {
-      showNotification("Error joining pool. Please try again.", "error");
+      showNotification('Error joining pool. Please try again.', 'error');
     } finally {
       submitBtn.disabled = false;
-      submitText.classList.remove("hidden");
-      submitLoading.classList.add("hidden");
+      submitText.classList.remove('hidden');
+      submitLoading.classList.add('hidden');
     }
   });
 }
 
 function closeJoinPoolModal() {
-  const modal = document.getElementById("join-pool-modal");
+  const modal = document.getElementById('join-pool-modal');
   if (modal) {
     modal.remove();
   }
@@ -371,9 +340,7 @@ function openCreatePoolModal(product) {
         <div id="create-pool-modal-from-product" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
             <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-90vh overflow-y-auto">
                 <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                    <h3 class="text-xl font-bold text-gray-900">Create Pool for ${
-                      product.name
-                    }</h3>
+                    <h3 class="text-xl font-bold text-gray-900">Create Pool for ${product.name}</h3>
                     <button id="close-pool-modal-btn" class="text-gray-400 hover:text-gray-600 transition-colors">
                         <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -382,24 +349,16 @@ function openCreatePoolModal(product) {
                 </div>
                 <form id="create-pool-form-from-product" class="px-6 py-4">
                     <div class="space-y-4">
-                        <!-- Product Info Display -->
                         <div class="bg-purple-50 rounded-lg p-4 border border-purple-200">
                             <div class="flex justify-between items-start">
                                 <div>
                                     <p class="text-sm text-purple-600 font-medium">Selected Product:</p>
-                                    <p class="font-bold text-gray-900">${
-                                      product.name
-                                    }</p>
-                                    <p class="text-sm text-gray-600">${
-                                      product.description ||
-                                      "No description available"
-                                    }</p>
+                                    <p class="font-bold text-gray-900">${product.name}</p>
+                                    <p class="text-sm text-gray-600">${product.description || 'No description available'}</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="text-sm text-purple-600">Unit Price:</p>
-                                    <p class="text-xl font-bold text-purple-600">$${product.unit_price.toFixed(
-                                      2
-                                    )}</p>
+                                    <p class="text-xl font-bold text-purple-600">$${product.unit_price.toFixed(2)}</p>
                                 </div>
                             </div>
                         </div>
@@ -436,56 +395,50 @@ function openCreatePoolModal(product) {
             </div>
         </div>
     `;
-  document.body.insertAdjacentHTML("beforeend", modalHTML);
-  const deadlineInput = document.getElementById("pool-deadline-from-product");
-  const today = new Date().toISOString().split("T")[0];
-  deadlineInput.setAttribute("min", today);
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+  const deadlineInput = document.getElementById('pool-deadline-from-product');
+  const today = new Date().toISOString().split('T')[0];
+  deadlineInput.setAttribute('min', today);
   setupCreatePoolModalEvents(product);
 }
 
 function setupCreatePoolModalEvents(product) {
-  const modal = document.getElementById("create-pool-modal-from-product");
-  const closeBtn = document.getElementById("close-pool-modal-btn");
-  const cancelBtn = document.getElementById("cancel-pool-modal-btn");
-  const form = document.getElementById("create-pool-form-from-product");
-  closeBtn.addEventListener("click", closeCreatePoolModal);
-  cancelBtn.addEventListener("click", closeCreatePoolModal);
-  modal.addEventListener("click", (e) => {
+  const modal = document.getElementById('create-pool-modal-from-product');
+  const closeBtn = document.getElementById('close-pool-modal-btn');
+  const cancelBtn = document.getElementById('cancel-pool-modal-btn');
+  const form = document.getElementById('create-pool-form-from-product');
+  closeBtn.addEventListener('click', closeCreatePoolModal);
+  cancelBtn.addEventListener('click', closeCreatePoolModal);
+  modal.addEventListener('click', (e) => {
     if (e.target === modal) {
       closeCreatePoolModal();
     }
   });
-  form.addEventListener("submit", async (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const submitBtn = document.getElementById("submit-pool-from-product-btn");
-    const submitText = document.getElementById("submit-pool-from-product-text");
-    const submitLoading = document.getElementById(
-      "submit-pool-from-product-loading"
-    );
+    const submitBtn = document.getElementById('submit-pool-from-product-btn');
+    const submitText = document.getElementById('submit-pool-from-product-text');
+    const submitLoading = document.getElementById('submit-pool-from-product-loading');
 
-    const minQuantity = document.getElementById(
-      "pool-capacity-from-product"
-    ).value;
-    const deadline = document.getElementById(
-      "pool-deadline-from-product"
-    ).value;
+    const minQuantity = document.getElementById('pool-capacity-from-product').value;
+    const deadline = document.getElementById('pool-deadline-from-product').value;
     if (!minQuantity || minQuantity < 2) {
-      showNotification("Minimum quantity must be at least 2", "error");
+      showNotification('Minimum quantity must be at least 2', 'error');
       return;
     }
 
     if (!deadline) {
-      showNotification("Please select a deadline", "error");
+      showNotification('Please select a deadline', 'error');
       return;
     }
     submitBtn.disabled = true;
-    submitText.classList.add("hidden");
-    submitLoading.classList.remove("hidden");
+    submitText.classList.add('hidden');
+    submitLoading.classList.remove('hidden');
 
     const poolData = {
       product_id: product.id,
-      start_at: new Date().toISOString().split("T")[0],
+      start_at: new Date().toISOString().split('T')[0],
       end_at: deadline,
       min_quantity: parseInt(minQuantity),
     };
@@ -493,39 +446,39 @@ function setupCreatePoolModalEvents(product) {
     try {
       await window.apiClient.createPool(poolData);
       closeCreatePoolModal();
-      showNotification("Pool created successfully!", "success");
+      showNotification('Pool created successfully!', 'success');
       await loadRelatedPools(product.id);
     } catch (error) {
-      showNotification("Error creating pool. Please try again.", "error");
+      showNotification('Error creating pool. Please try again.', 'error');
     } finally {
       submitBtn.disabled = false;
-      submitText.classList.remove("hidden");
-      submitLoading.classList.add("hidden");
+      submitText.classList.remove('hidden');
+      submitLoading.classList.add('hidden');
     }
   });
 }
 
 function closeCreatePoolModal() {
-  const modal = document.getElementById("create-pool-modal-from-product");
+  const modal = document.getElementById('create-pool-modal-from-product');
   if (modal) {
     modal.remove();
   }
 }
 
 function showError() {
-  document.getElementById("product-loading").classList.add("hidden");
-  document.getElementById("product-error").classList.remove("hidden");
+  document.getElementById('product-loading').classList.add('hidden');
+  document.getElementById('product-error').classList.remove('hidden');
 }
 
-function showNotification(message, type = "success") {
-  const bgColor = type === "error" ? "bg-red-500" : "bg-green-500";
-  const notification = document.createElement("div");
+function showNotification(message, type = 'success') {
+  const bgColor = type === 'error' ? 'bg-red-500' : 'bg-green-500';
+  const notification = document.createElement('div');
   notification.className = `fixed top-24 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-opacity`;
   notification.textContent = message;
   document.body.appendChild(notification);
 
   setTimeout(() => {
-    notification.style.opacity = "0";
+    notification.style.opacity = '0';
     setTimeout(() => notification.remove(), 300);
   }, 3000);
 }

@@ -63,21 +63,21 @@ def handler(event, context):
 
     try:
         user_sub = get_user_sub_from_token(event)
-        
+
         if not user_sub:
             return {
                 "statusCode": 401,
                 "headers": {"Access-Control-Allow-Origin": "*"},
                 "body": json.dumps({"error": "Unauthorized - no user ID found in token"}),
             }
-        
+
         if not check_user_role(conn, user_sub, "company"):
             return {
                 "statusCode": 403,
                 "headers": {"Access-Control-Allow-Origin": "*"},
                 "body": json.dumps({"error": "Forbidden - only companies can create products"}),
             }
-        
+
         with conn.cursor() as cur:
             body = json.loads(event.get("body", "{}"))
             name = body.get("name")

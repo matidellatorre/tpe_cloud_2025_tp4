@@ -30,16 +30,16 @@ def get_user_sub_from_token(event):
     try:
         request_context = event.get("requestContext", {})
         authorizer = request_context.get("authorizer", {})
-        
+
         claims = authorizer.get("claims", {})
         if not claims:
             jwt = authorizer.get("jwt", {})
             claims = jwt.get("claims", {})
-        
+
         sub = claims.get("sub")
         if sub:
             return sub
-        
+
         return None
     except Exception as e:
         print(f"Error extracting sub from token: {e}")
@@ -56,7 +56,7 @@ def handler(event, context):
 
     try:
         sub = get_user_sub_from_token(event)
-        
+
         if not sub:
             return {
                 "statusCode": 401,
@@ -75,24 +75,28 @@ def handler(event, context):
                 return {
                     "statusCode": 200,
                     "headers": {"Access-Control-Allow-Origin": "*"},
-                    "body": json.dumps({
-                        "id": result[0],
-                        "email": result[1],
-                        "cognito_sub": result[2],
-                        "role": result[3],
-                        "created_at": result[4].isoformat(),
-                        "updated_at": result[5].isoformat(),
-                    }),
+                    "body": json.dumps(
+                        {
+                            "id": result[0],
+                            "email": result[1],
+                            "cognito_sub": result[2],
+                            "role": result[3],
+                            "created_at": result[4].isoformat(),
+                            "updated_at": result[5].isoformat(),
+                        }
+                    ),
                 }
             else:
                 return {
                     "statusCode": 404,
                     "headers": {"Access-Control-Allow-Origin": "*"},
-                    "body": json.dumps({
-                        "cognito_sub": sub,
-                        "role": None,
-                        "message": "No role assigned yet"
-                    }),
+                    "body": json.dumps(
+                        {
+                            "cognito_sub": sub,
+                            "role": None,
+                            "message": "No role assigned yet",
+                        }
+                    ),
                 }
 
     except (Exception, psycopg2.Error) as e:
@@ -111,4 +115,3 @@ def handler(event, context):
     finally:
         if conn:
             conn.close()
-

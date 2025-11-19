@@ -1,32 +1,24 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign Up - Grupi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body class="bg-gray-50 min-h-screen flex items-center justify-center">
     <div class="max-w-md w-full space-y-8">
       <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Create Account
-        </h2>
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Create Account</h2>
         <p class="mt-2 text-center text-sm text-gray-600">
           Or
-          <a
-            href="login.html"
-            class="font-medium text-purple-600 hover:text-purple-500"
-            >sign in</a
-          >
+          <a href="login.html" class="font-medium text-purple-600 hover:text-purple-500">sign in</a>
         </p>
       </div>
       <form class="mt-8 space-y-6" id="signup-form">
         <div class="space-y-4">
           <div>
-            <label for="email" class="block text-sm font-medium text-gray-700"
-              >Email</label
-            >
+            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
             <input
               id="email"
               name="email"
@@ -37,11 +29,7 @@
             />
           </div>
           <div>
-            <label
-              for="password"
-              class="block text-sm font-medium text-gray-700"
-              >Password</label
-            >
+            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
             <input
               id="password"
               name="password"
@@ -52,11 +40,7 @@
             />
           </div>
           <div>
-            <label
-              for="confirm-password"
-              class="block text-sm font-medium text-gray-700"
-              >Confirm Password</label
-            >
+            <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
             <input
               id="confirm-password"
               name="confirm-password"
@@ -67,49 +51,22 @@
             />
           </div>
 
-          <!-- Role Selection -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2"
-              >I want to:</label
-            >
+            <label class="block text-sm font-medium text-gray-700 mb-2">I want to:</label>
             <div class="space-y-2">
-              <label
-                class="flex items-start p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-600 transition-all duration-200"
-              >
-                <input
-                  type="radio"
-                  name="role"
-                  value="client"
-                  required
-                  class="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
-                />
+              <label class="flex items-start p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-600 transition-all duration-200">
+                <input type="radio" name="role" value="client" required class="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300" />
                 <div class="ml-3">
-                  <span class="block text-sm font-medium text-gray-900"
-                    >Join pools and save money</span
-                  >
-                  <span class="block text-sm text-gray-500"
-                    >Browse products, join pools, and get bulk discounts</span
-                  >
+                  <span class="block text-sm font-medium text-gray-900">Join pools and save money</span>
+                  <span class="block text-sm text-gray-500">Browse products, join pools, and get bulk discounts</span>
                 </div>
               </label>
 
-              <label
-                class="flex items-start p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-600 transition-all duration-200"
-              >
-                <input
-                  type="radio"
-                  name="role"
-                  value="company"
-                  required
-                  class="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
-                />
+              <label class="flex items-start p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-600 transition-all duration-200">
+                <input type="radio" name="role" value="company" required class="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300" />
                 <div class="ml-3">
-                  <span class="block text-sm font-medium text-gray-900"
-                    >Create products and pools</span
-                  >
-                  <span class="block text-sm text-gray-500"
-                    >Sell products, create pools, and manage sales</span
-                  >
+                  <span class="block text-sm font-medium text-gray-900">Create products and pools</span>
+                  <span class="block text-sm text-gray-500">Sell products, create pools, and manage sales</span>
                 </div>
               </label>
             </div>
@@ -124,94 +81,76 @@
           >
             <span id="signup-text">Create Account</span>
             <div id="signup-loading" class="hidden ml-2">
-              <div
-                class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"
-              ></div>
+              <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
             </div>
           </button>
         </div>
 
-        <div
-          id="error-message"
-          class="hidden text-red-600 text-center text-sm"
-        ></div>
-        <div
-          id="success-message"
-          class="hidden text-green-600 text-center text-sm"
-        ></div>
+        <div id="error-message" class="hidden text-red-600 text-center text-sm"></div>
+        <div id="success-message" class="hidden text-green-600 text-center text-sm"></div>
       </form>
     </div>
 
     <script>
-      document
-        .getElementById("signup-form")
-        .addEventListener("submit", async function (e) {
-          e.preventDefault();
+      document.getElementById('signup-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
 
-          const email = document.getElementById("email").value;
-          const password = document.getElementById("password").value;
-          const confirmPassword =
-            document.getElementById("confirm-password").value;
-          const errorDiv = document.getElementById("error-message");
-          const successDiv = document.getElementById("success-message");
-          if (password !== confirmPassword) {
-            errorDiv.textContent = "Passwords do not match";
-            errorDiv.classList.remove("hidden");
-            successDiv.classList.add("hidden");
-            return;
-          }
-          if (password.length < 8) {
-            errorDiv.textContent = "Password must be at least 8 characters";
-            errorDiv.classList.remove("hidden");
-            successDiv.classList.add("hidden");
-            return;
-          }
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        const errorDiv = document.getElementById('error-message');
+        const successDiv = document.getElementById('success-message');
+        if (password !== confirmPassword) {
+          errorDiv.textContent = 'Passwords do not match';
+          errorDiv.classList.remove('hidden');
+          successDiv.classList.add('hidden');
+          return;
+        }
+        if (password.length < 8) {
+          errorDiv.textContent = 'Password must be at least 8 characters';
+          errorDiv.classList.remove('hidden');
+          successDiv.classList.add('hidden');
+          return;
+        }
 
-          // Get selected role
-          const role = document.querySelector(
-            'input[name="role"]:checked'
-          )?.value;
+        const role = document.querySelector('input[name="role"]:checked')?.value;
 
-          // Validate role selection
-          if (!role) {
-            errorDiv.textContent = "Please select a role";
-            errorDiv.classList.remove("hidden");
-            successDiv.classList.add("hidden");
-            return;
-          }
+        if (!role) {
+          errorDiv.textContent = 'Please select a role';
+          errorDiv.classList.remove('hidden');
+          successDiv.classList.add('hidden');
+          return;
+        }
 
-          const signupBtn = document.getElementById("signup-btn");
-          const signupText = document.getElementById("signup-text");
-          const signupLoading = document.getElementById("signup-loading");
+        const signupBtn = document.getElementById('signup-btn');
+        const signupText = document.getElementById('signup-text');
+        const signupLoading = document.getElementById('signup-loading');
 
-          try {
-            errorDiv.classList.add("hidden");
-            successDiv.classList.add("hidden");
-            signupBtn.disabled = true;
-            signupText.classList.add("hidden");
-            signupLoading.classList.remove("hidden");
+        try {
+          errorDiv.classList.add('hidden');
+          successDiv.classList.add('hidden');
+          signupBtn.disabled = true;
+          signupText.classList.add('hidden');
+          signupLoading.classList.remove('hidden');
 
-            await window.cognitoAuth.signupWithPassword(email, password);
+          await window.cognitoAuth.signupWithPassword(email, password);
 
-            localStorage.setItem("user_email", email);
+          localStorage.setItem('user_email', email);
 
-            localStorage.setItem("pending_email", email);
-            localStorage.setItem("pending_password", password);
-            localStorage.setItem("pending_role", role);
+          localStorage.setItem('pending_email', email);
+          localStorage.setItem('pending_password', password);
+          localStorage.setItem('pending_role', role);
 
-            // Redirect immediately with loading still showing
-            window.location.href = `confirm-email.html?email=${encodeURIComponent(
-              email
-            )}`;
-          } catch (error) {
-            signupBtn.disabled = false;
-            signupText.classList.remove("hidden");
-            signupLoading.classList.add("hidden");
-            errorDiv.textContent = error.message || "Error creating account";
-            errorDiv.classList.remove("hidden");
-            successDiv.classList.add("hidden");
-          }
-        });
+          window.location.href = `confirm-email.html?email=${encodeURIComponent(email)}`;
+        } catch (error) {
+          signupBtn.disabled = false;
+          signupText.classList.remove('hidden');
+          signupLoading.classList.add('hidden');
+          errorDiv.textContent = error.message || 'Error creating account';
+          errorDiv.classList.remove('hidden');
+          successDiv.classList.add('hidden');
+        }
+      });
     </script>
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1000.0.min.js"></script>
     <script src="config.js"></script>

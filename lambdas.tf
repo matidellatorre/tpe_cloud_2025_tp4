@@ -55,7 +55,7 @@ data "archive_file" "lambda_cognito_trigger_zip" {
 resource "aws_lambda_function" "cognito_trigger" {
   filename      = data.archive_file.lambda_cognito_trigger_zip.output_path
   function_name = "${var.project_name}-cognito-trigger"
-  role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole" # Tu LabRole
+  role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
   handler       = "lambda_cognito_trigger.handler"
   runtime       = "python3.11"
   timeout       = 30

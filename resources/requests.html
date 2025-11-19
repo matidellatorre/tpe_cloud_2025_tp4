@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,112 +7,42 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body class="bg-gray-50">
-    <nav
-      class="bg-white shadow-md fixed w-full top-0 z-50 border-b border-gray-200"
-    >
+    <nav class="bg-white shadow-md fixed w-full top-0 z-50 border-b border-gray-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-20">
           <div class="flex items-center">
             <div class="flex-shrink-0 flex items-center space-x-3">
-              <img
-                src="logo.png"
-                alt="Grupi Logo"
-                class="w-10 h-10 object-contain"
-              />
-              <h1
-                class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent"
-              >
-                Grupi
-              </h1>
+              <img src="logo.png" alt="Grupi Logo" class="w-10 h-10 object-contain" />
+              <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">Grupi</h1>
             </div>
           </div>
 
           <div class="hidden md:flex items-center space-x-1">
-            <a
-              href="index.html"
-              class="nav-link text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
-              >Home</a
-            >
-            <a
-              href="pools.html"
-              class="nav-link text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
-              >Pools</a
-            >
-            <a
-              href="products.html"
-              class="nav-link text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
-              >Products</a
-            >
-            <a
-              href="requests.html"
-              class="nav-link text-purple-600 bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
-              >Requests</a
-            >
-            <a
-              href="analytics.html"
-              class="nav-link text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
-              >Analytics</a
-            >
+            <a href="index.html" class="nav-link text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">Home</a>
+            <a href="pools.html" class="nav-link text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">Pools</a>
+            <a href="products.html" class="nav-link text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">Products</a>
+            <a href="requests.html" class="nav-link text-purple-600 bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">Requests</a>
+            <a href="analytics.html" class="nav-link text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">Analytics</a>
 
-            <!-- Auth buttons (when not logged in) -->
             <div id="auth-buttons" class="flex items-center space-x-2 ml-4">
-              <a
-                href="login.html"
-                class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
-                >Login</a
-              >
-              <a
-                href="signup.html"
-                class="border border-purple-600 text-purple-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-50 transition-colors"
-                >Sign Up</a
-              >
+              <a href="login.html" class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors">Login</a>
+              <a href="signup.html" class="border border-purple-600 text-purple-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-50 transition-colors">Sign Up</a>
             </div>
 
-            <!-- User info (when logged in) -->
             <div id="user-info" class="relative ml-4 hidden">
-              <button
-                type="button"
-                id="user-menu-btn"
-                class="flex items-center space-x-2 hover:bg-purple-50 rounded-lg px-3 py-2 transition-colors"
-              >
-                <div
-                  id="user-avatar"
-                  class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white font-bold text-base"
-                ></div>
+              <button type="button" id="user-menu-btn" class="flex items-center space-x-2 hover:bg-purple-50 rounded-lg px-3 py-2 transition-colors">
+                <div id="user-avatar" class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white font-bold text-base"></div>
                 <div class="flex flex-col">
-                  <span
-                    id="user-email"
-                    class="text-sm font-medium text-gray-900"
-                  ></span>
+                  <span id="user-email" class="text-sm font-medium text-gray-900"></span>
                   <span id="user-role" class="text-xs text-gray-500"></span>
                 </div>
-                <svg
-                  class="w-4 h-4 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                  ></path>
+                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
               </button>
 
-              <!-- Dropdown menu -->
-              <div
-                id="user-dropdown"
-                class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50"
-              >
-                <button
-                  type="button"
-                  id="logout-btn"
-                  class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
-                >
-                  Logout
-                </button>
+              <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                <button type="button" id="logout-btn" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors">Logout</button>
               </div>
             </div>
           </div>
@@ -122,55 +52,21 @@
               id="mobile-menu-button"
               class="inline-flex items-center justify-center p-2 rounded-lg text-gray-700 hover:text-purple-600 hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500 transition-colors"
             >
-              <svg
-                class="h-6 w-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+              <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
           </div>
         </div>
       </div>
 
-      <div
-        id="mobile-menu"
-        class="hidden md:hidden bg-white border-t border-gray-200"
-      >
+      <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
         <div class="px-4 pt-2 pb-4 space-y-1">
-          <a
-            href="index.html"
-            class="text-gray-700 hover:text-purple-600 hover:bg-purple-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors"
-            >Home</a
-          >
-          <a
-            href="pools.html"
-            class="text-gray-700 hover:text-purple-600 hover:bg-purple-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors"
-            >Pools</a
-          >
-          <a
-            href="products.html"
-            class="text-gray-700 hover:text-purple-600 hover:bg-purple-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors"
-            >Products</a
-          >
-          <a
-            href="requests.html"
-            class="text-purple-600 bg-purple-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors"
-            >Requests</a
-          >
-          <a
-            href="analytics.html"
-            class="text-gray-700 hover:text-purple-600 hover:bg-purple-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors"
-            >Analytics</a
-          >
+          <a href="index.html" class="text-gray-700 hover:text-purple-600 hover:bg-purple-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors">Home</a>
+          <a href="pools.html" class="text-gray-700 hover:text-purple-600 hover:bg-purple-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors">Pools</a>
+          <a href="products.html" class="text-gray-700 hover:text-purple-600 hover:bg-purple-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors">Products</a>
+          <a href="requests.html" class="text-purple-600 bg-purple-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors">Requests</a>
+          <a href="analytics.html" class="text-gray-700 hover:text-purple-600 hover:bg-purple-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors">Analytics</a>
         </div>
       </div>
     </nav>
@@ -178,31 +74,14 @@
     <main class="pt-28 pb-12 px-4 sm:px-6 lg:px-8">
       <div class="max-w-7xl mx-auto">
         <div class="mb-8">
-          <h1 class="text-4xl font-bold text-gray-900 mb-3">
-            My Pool Requests
-          </h1>
-          <p class="text-lg text-gray-600">
-            Track your pool join requests and order status
-          </p>
+          <h1 class="text-4xl font-bold text-gray-900 mb-3">My Pool Requests</h1>
+          <p class="text-lg text-gray-600">Track your pool join requests and order status</p>
         </div>
 
         <div id="requests-loading" class="text-center py-12 hidden">
-          <div
-            class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-100 mb-4"
-          >
-            <svg
-              class="w-5 h-5 text-purple-600 animate-spin"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
+          <div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-100 mb-4">
+            <svg class="w-5 h-5 text-purple-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
           </div>
           <p class="text-gray-600">Loading requests...</p>
@@ -211,16 +90,8 @@
         <div id="requests-container" class="space-y-4"></div>
 
         <div id="empty-state" class="hidden text-center py-16">
-          <div
-            class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4"
-          >
-            <svg
-              class="w-8 h-8 text-gray-400"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+            <svg class="w-8 h-8 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -229,18 +100,9 @@
               />
             </svg>
           </div>
-          <h3 class="text-xl font-semibold text-gray-900 mb-2">
-            No requests found
-          </h3>
-          <p class="text-gray-600 mb-6">
-            Join a pool to start tracking your orders!
-          </p>
-          <a
-            href="pools.html"
-            class="inline-block bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg font-medium transition-all shadow-md"
-          >
-            Browse Pools
-          </a>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">No requests found</h3>
+          <p class="text-gray-600 mb-6">Join a pool to start tracking your orders!</p>
+          <a href="pools.html" class="inline-block bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg font-medium transition-all shadow-md"> Browse Pools </a>
         </div>
       </div>
     </main>
@@ -253,60 +115,54 @@
     <script src="nav-role-handler.js"></script>
     <script src="requests.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const logoutBtn = document.getElementById("logout-btn");
-        const authButtons = document.getElementById("auth-buttons");
-        const userInfo = document.getElementById("user-info");
-        const userMenuBtn = document.getElementById("user-menu-btn");
-        const userDropdown = document.getElementById("user-dropdown");
-        const userAvatar = document.getElementById("user-avatar");
-        const userEmail = document.getElementById("user-email");
-        const userRole = document.getElementById("user-role");
+      document.addEventListener('DOMContentLoaded', function () {
+        const logoutBtn = document.getElementById('logout-btn');
+        const authButtons = document.getElementById('auth-buttons');
+        const userInfo = document.getElementById('user-info');
+        const userMenuBtn = document.getElementById('user-menu-btn');
+        const userDropdown = document.getElementById('user-dropdown');
+        const userAvatar = document.getElementById('user-avatar');
+        const userEmail = document.getElementById('user-email');
+        const userRole = document.getElementById('user-role');
 
         function updateAuthUI() {
           if (window.cognitoAuth && window.cognitoAuth.isLoggedIn()) {
-            authButtons.classList.add("hidden");
-            userInfo.classList.remove("hidden");
+            authButtons.classList.add('hidden');
+            userInfo.classList.remove('hidden');
 
-            const email =
-              localStorage.getItem("user_email") || "user@example.com";
-            const role = localStorage.getItem("user_role");
+            const email = localStorage.getItem('user_email') || 'user@example.com';
+            const role = localStorage.getItem('user_role');
             const initial = email.charAt(0).toUpperCase();
 
             if (userAvatar) userAvatar.textContent = initial;
             if (userEmail) userEmail.textContent = email;
             if (userRole) {
-              const roleText =
-                role === "client"
-                  ? "Client"
-                  : role === "company"
-                  ? "Company"
-                  : "User";
+              const roleText = role === 'client' ? 'Client' : role === 'company' ? 'Company' : 'User';
               userRole.textContent = `Role: ${roleText}`;
             }
           } else {
-            authButtons.classList.remove("hidden");
-            userInfo.classList.add("hidden");
+            authButtons.classList.remove('hidden');
+            userInfo.classList.add('hidden');
           }
         }
         if (userMenuBtn) {
-          userMenuBtn.addEventListener("click", (e) => {
+          userMenuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            userDropdown.classList.toggle("hidden");
+            userDropdown.classList.toggle('hidden');
           });
         }
-        document.addEventListener("click", (e) => {
-          if (userDropdown && !userDropdown.classList.contains("hidden")) {
-            userDropdown.classList.add("hidden");
+        document.addEventListener('click', (e) => {
+          if (userDropdown && !userDropdown.classList.contains('hidden')) {
+            userDropdown.classList.add('hidden');
           }
         });
         if (userDropdown) {
-          userDropdown.addEventListener("click", (e) => {
+          userDropdown.addEventListener('click', (e) => {
             e.stopPropagation();
           });
         }
         if (logoutBtn) {
-          logoutBtn.addEventListener("click", () => {
+          logoutBtn.addEventListener('click', () => {
             if (window.cognitoAuth) {
               window.cognitoAuth.logout();
             }

@@ -1,7 +1,8 @@
 import json
 import os
-import psycopg2
+
 import boto3
+import psycopg2
 
 db_host = os.environ.get("DB_HOST")
 db_port = os.environ.get("DB_PORT")
@@ -12,23 +13,31 @@ sns_topic_arn = os.environ.get("SNS_TOPIC_ARN")
 
 sns_client = boto3.client("sns")
 
+
 def get_db_connection():
     try:
         conn = psycopg2.connect(
-            host=db_host, port=db_port, dbname=db_name, user=db_user, password=db_password
+            host=db_host,
+            port=db_port,
+            dbname=db_name,
+            user=db_user,
+            password=db_password,
         )
         return conn
     except psycopg2.Error as e:
         print(f"Error connecting to PostgreSQL: {e}")
         return None
 
+
 def get_product_name(cur, product_id):
     cur.execute("SELECT name FROM product WHERE id = %s", (product_id,))
     return cur.fetchone()[0]
 
+
 def get_pool_participants(cur, pool_id):
     cur.execute("SELECT email, quantity FROM request WHERE pool_id = %s", (pool_id,))
     return cur.fetchall()
+
 
 def handler(event, context):
     print("Iniciando chequeo de pools vencidos...")
@@ -39,7 +48,6 @@ def handler(event, context):
 
     try:
         with conn.cursor() as cur:
-            # 1. Buscar pools vencidos que AÚN no se hayan procesado
             cur.execute(
                 """
                 SELECT id, product_id, min_quantity
@@ -53,7 +61,6 @@ def handler(event, context):
             for pool in expired_pools:
                 pool_id, product_id, min_quantity = pool
 
-                # 2. Calcular el total de unidades
                 cur.execute(
                     "SELECT COALESCE(SUM(quantity), 0) FROM request WHERE pool_id = %s",
                     (pool_id,),
@@ -68,7 +75,6 @@ def handler(event, context):
                 subject = ""
                 message_body = ""
 
-                # 3. Determinar estado final
                 if total_joined >= min_quantity:
                     final_status = "success"
                     subject = f"ÉXITO: El pool para '{product_name}' se completó!"
@@ -92,20 +98,14 @@ def handler(event, context):
                         f"Participantes: {', '.join(participant_list)}"
                     )
 
-                # 4. Publicar en SNS
                 print(f"Publicando en SNS para Pool ID {pool_id}: {subject}")
-                sns_client.publish(
-                    TopicArn=sns_topic_arn,
-                    Message=message_body,
-                    Subject=subject
-                )
+                sns_client.publish(TopicArn=sns_topic_arn, Message=message_body, Subject=subject)
 
-                # 5. Marcar el pool como procesado en la DB
                 cur.execute(
                     "UPDATE pool SET status = %s WHERE id = %s",
                     (final_status, pool_id),
                 )
-            
+
             conn.commit()
             print(f"Procesamiento finalizado. {len(expired_pools)} pools actualizados.")
 

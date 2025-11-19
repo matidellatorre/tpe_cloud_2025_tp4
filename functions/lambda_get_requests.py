@@ -44,9 +44,7 @@ def handler(event, context):
             return {
                 "statusCode": 400,
                 "headers": {"Access-Control-Allow-Origin": "*"},
-                "body": json.dumps(
-                    {"error": "Either 'email' or 'pool_id' parameter is required"}
-                ),
+                "body": json.dumps({"error": "Either 'email' or 'pool_id' parameter is required"}),
             }
 
         with conn.cursor() as cur:
@@ -85,7 +83,6 @@ def handler(event, context):
                     for row in requests
                 ]
 
-            # Si se proporciona pool_id, buscar por pool_id
             elif pool_id:
                 cur.execute(
                     "SELECT id, pool_id, email, quantity, created_at FROM request WHERE pool_id = %s ORDER BY created_at DESC",

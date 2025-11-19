@@ -1,7 +1,8 @@
 import json
 import os
-import psycopg2
+
 import boto3
+import psycopg2
 
 db_host = os.environ.get("DB_HOST")
 db_port = os.environ.get("DB_PORT")
@@ -11,6 +12,7 @@ db_password = os.environ.get("DB_PASSWORD")
 sns_topic_arn = os.environ.get("SNS_TOPIC_ARN")
 
 sns_client = boto3.client("sns")
+
 
 def get_db_connection():
     try:
@@ -27,15 +29,13 @@ def get_db_connection():
         print(f"Error connecting to PostgreSQL: {e}")
         return None
 
+
 def check_and_notify_if_full(conn, pool_id):
     try:
         with conn.cursor() as cur:
-            # Obtener estado del pool y el mínimo
             cur.execute(
-                "SELECT p.min_quantity, p.status, pr.name FROM pool p "
-                "JOIN product pr ON p.product_id = pr.id "
-                "WHERE p.id = %s",
-                (pool_id,)
+                "SELECT p.min_quantity, p.status, pr.name FROM pool p " "JOIN product pr ON p.product_id = pr.id " "WHERE p.id = %s",
+                (pool_id,),
             )
             pool_data = cur.fetchone()
             if not pool_data:
@@ -44,34 +44,25 @@ def check_and_notify_if_full(conn, pool_id):
 
             min_quantity, status, product_name = pool_data
 
-            # Si el pool ya está cerrado, no hacer nada más
-            if status != 'open':
+            if status != "open":
                 print(f"Pool {pool_id} ya está cerrado (status: {status}). No se notifica.")
                 return
 
-            # Calcular el total actual
             cur.execute(
                 "SELECT COALESCE(SUM(quantity), 0) FROM request WHERE pool_id = %s",
                 (pool_id,),
             )
             total_joined = cur.fetchone()[0]
 
-            # Si se alcanzó o superó el mínimo
             if total_joined >= min_quantity:
                 print(f"¡Pool {pool_id} completado! Total: {total_joined}/{min_quantity}")
-                
-                # Marcar como exitoso
-                cur.execute(
-                    "UPDATE pool SET status = 'success' WHERE id = %s",
-                    (pool_id,)
-                )
 
-                # Obtener participantes para el email
+                cur.execute("UPDATE pool SET status = 'success' WHERE id = %s", (pool_id,))
+
                 cur.execute("SELECT email, quantity FROM request WHERE pool_id = %s", (pool_id,))
                 participants = cur.fetchall()
                 participant_list = [f"{email} ({qty}u)" for email, qty in participants]
 
-                # Formar y enviar mensaje
                 subject = f"ÉXITO (Inmediato): El pool para '{product_name}' se acaba de llenar!"
                 message_body = (
                     f"¡Excelentes noticias!\n\n"
@@ -82,14 +73,9 @@ def check_and_notify_if_full(conn, pool_id):
                     f"Participantes: {', '.join(participant_list)}"
                 )
 
-                sns_client.publish(
-                    TopicArn=sns_topic_arn,
-                    Message=message_body,
-                    Subject=subject
-                )
+                sns_client.publish(TopicArn=sns_topic_arn, Message=message_body, Subject=subject)
                 print(f"Notificación de cierre inmediato enviada para pool {pool_id}.")
-                
-                # commit de la transacción de esta función
+
                 conn.commit()
 
     except (Exception, psycopg2.Error) as e:
@@ -136,21 +122,21 @@ def handler(event, context):
 
     try:
         user_sub = get_user_sub_from_token(event)
-        
+
         if not user_sub:
             return {
                 "statusCode": 401,
                 "headers": {"Access-Control-Allow-Origin": "*"},
                 "body": json.dumps({"error": "Unauthorized - no user ID found in token"}),
             }
-        
+
         if not check_user_role(conn, user_sub, "client"):
             return {
                 "statusCode": 403,
                 "headers": {"Access-Control-Allow-Origin": "*"},
                 "body": json.dumps({"error": "Forbidden - only clients can join pools"}),
             }
-        
+
         with conn.cursor() as cur:
             pool_id = event["pathParameters"]["id"]
             body = json.loads(event.get("body", "{}"))
@@ -164,12 +150,11 @@ def handler(event, context):
                     "body": json.dumps({"error": "Email is required in request body"}),
                 }
 
-            # No permitir unirse a un pool cerrado
             cur.execute("SELECT status FROM pool WHERE id = %s", (pool_id,))
             pool_status = cur.fetchone()
-            
-            if pool_status and pool_status[0] != 'open':
-                 return {
+
+            if pool_status and pool_status[0] != "open":
+                return {
                     "statusCode": 400,
                     "body": json.dumps({"error": f"El pool (ID: {pool_id}) ya está cerrado."}),
                 }
@@ -192,19 +177,16 @@ def handler(event, context):
 
             except psycopg2.IntegrityError as e:
                 conn.rollback()
-                # Chequear si es la restricción UNIQUE
                 if "request_pool_id_email_key" in str(e):
                     return {
                         "statusCode": 400,
                         "body": json.dumps({"error": "This email has already joined this pool."}),
                     }
-                # Chequear si es una Foreign Key (ej: pool_id no existe)
                 if "request_pool_id_fkey" in str(e):
                     return {
                         "statusCode": 404,
                         "body": json.dumps({"error": f"Pool with ID {pool_id} not found."}),
                     }
-                # Otro error de integridad
                 return {
                     "statusCode": 400,
                     "headers": {"Access-Control-Allow-Origin": "*"},
@@ -228,4 +210,3 @@ def handler(event, context):
     finally:
         if conn:
             conn.close()
-

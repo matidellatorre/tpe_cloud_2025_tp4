@@ -1,7 +1,7 @@
 let requestsData = [];
 
-let currentFilter = "all";
-document.addEventListener("DOMContentLoaded", async () => {
+let currentFilter = 'all';
+document.addEventListener('DOMContentLoaded', async () => {
   await loadRequests();
   renderRequests();
   // updateStats();
@@ -9,66 +9,62 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 function setupMobileMenu() {
-  const mobileMenuButton = document.getElementById("mobile-menu-button");
-  const mobileMenu = document.getElementById("mobile-menu");
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
 
   if (mobileMenuButton && mobileMenu) {
-    mobileMenuButton.addEventListener("click", () => {
-      mobileMenu.classList.toggle("hidden");
+    mobileMenuButton.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
     });
   }
 }
 
 function getStatusInfo(status) {
   switch (status) {
-    case "open":
+    case 'open':
       return {
-        text: "Active",
-        classes: "bg-green-100 text-green-800",
-        color: "green",
+        text: 'Active',
+        classes: 'bg-green-100 text-green-800',
+        color: 'green',
       };
-    case "success":
+    case 'success':
       return {
-        text: "Completed",
-        classes: "bg-blue-100 text-blue-800",
-        color: "blue",
+        text: 'Completed',
+        classes: 'bg-blue-100 text-blue-800',
+        color: 'blue',
       };
-    case "failed":
+    case 'failed':
       return {
-        text: "Closed",
-        classes: "bg-red-100 text-red-800",
-        color: "red",
+        text: 'Closed',
+        classes: 'bg-red-100 text-red-800',
+        color: 'red',
       };
     default:
       return {
         text: status,
-        classes: "bg-gray-100 text-gray-800",
-        color: "gray",
+        classes: 'bg-gray-100 text-gray-800',
+        color: 'gray',
       };
   }
 }
 
 function renderRequests() {
-  const container = document.getElementById("requests-container");
-  const emptyState = document.getElementById("empty-state");
+  const container = document.getElementById('requests-container');
+  const emptyState = document.getElementById('empty-state');
 
   let filteredRequests = requestsData;
-  if (currentFilter !== "all") {
-    filteredRequests = requestsData.filter(
-      (req) => req.status === currentFilter,
-    );
+  if (currentFilter !== 'all') {
+    filteredRequests = requestsData.filter((req) => req.status === currentFilter);
   }
 
   if (filteredRequests.length === 0) {
-    container.innerHTML = "";
-    emptyState.classList.remove("hidden");
+    container.innerHTML = '';
+    emptyState.classList.remove('hidden');
     return;
   }
 
-  emptyState.classList.add("hidden");
-  container.innerHTML = filteredRequests
-    .map((request) => createRequestCard(request))
-    .join("");
+  emptyState.classList.add('hidden');
+  container.innerHTML = filteredRequests.map((request) => createRequestCard(request)).join('');
 }
 
 function createRequestCard(request) {
@@ -79,11 +75,11 @@ function createRequestCard(request) {
 
   let statusText = statusInfo.text;
 
-  if (request.pool?.status === "open") {
+  if (request.pool?.status === 'open') {
     if (daysRemaining >= 0) {
       statusText = `Waiting for pool to complete (${daysRemaining} days left)`;
     } else {
-      statusText = "Pool expired before completion";
+      statusText = 'Pool expired before completion';
     }
   }
 
@@ -102,7 +98,6 @@ function createRequestCard(request) {
   return `
         <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-200">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                <!-- Left: Request Info -->
                 <div class="flex-1">
                     <div class="flex items-start justify-between mb-3">
                         <div class="flex-1">
@@ -113,7 +108,7 @@ function createRequestCard(request) {
                                 ? `
                                 <p class="text-sm text-gray-600 mt-1">Product: ${request.pool.product.name}</p>
                             `
-                                : ""
+                                : ''
                             }
                         </div>
 
@@ -121,12 +116,10 @@ function createRequestCard(request) {
                             ${statusInfo.text}
                         </span>
                     </div>
-                    <!-- Status Info -->
                     <div class="flex items-center space-x-2 mb-4 text-${statusInfo.color}-600">
                         ${statusIcon}
                         <span class="text-sm font-medium">${statusText}</span>
                     </div>
-                    <!-- Request Details -->
                     <div class="flex items-center space-x-2 text-xs text-gray-600 mb-3">
                         <div class="flex items-center">
                             <div class="w-2 h-2 rounded-full bg-gray-400 mr-1"></div>
@@ -139,7 +132,6 @@ function createRequestCard(request) {
                     </div>
                 </div>
 
-                <!-- Right: Pool Info -->
                 <div class="lg:text-right border-t lg:border-t-0 lg:border-l lg:pl-6 pt-4 lg:pt-0 border-gray-200">
                     <div class="mb-3">
                         <p class="text-xs text-gray-500 mb-1">Pool Request</p>
@@ -162,41 +154,36 @@ function createRequestCard(request) {
 
 async function loadRequests() {
   try {
-    const loading = document.getElementById("requests-loading");
-    if (loading) loading.classList.remove("hidden");
+    const loading = document.getElementById('requests-loading');
+    if (loading) loading.classList.remove('hidden');
 
-    // Obtener el email del usuario (solo clientes pueden acceder a esta página)
-    const userEmail = localStorage.getItem("user_email");
+    const userEmail = localStorage.getItem('user_email');
 
     if (!userEmail) {
-      console.error("No user email found");
-      if (loading) loading.classList.add("hidden");
-      showNotification("Error loading requests. Please login again.", "error");
+      console.error('No user email found');
+      if (loading) loading.classList.add('hidden');
+      showNotification('Error loading requests. Please login again.', 'error');
       return;
     }
 
     let allRequests = [];
 
     try {
-      // Obtener requests del usuario usando la nueva lambda unificada
       const userRequests = await window.apiClient.getRequests({
         email: userEmail,
       });
 
-      // Enriquecer cada request con información del producto
       for (const request of userRequests) {
         try {
           let poolWithProduct = request.pool || {};
 
           if (poolWithProduct.product_id) {
-            const product = await window.apiClient.getProduct(
-              poolWithProduct.product_id,
-            );
+            const product = await window.apiClient.getProduct(poolWithProduct.product_id);
             poolWithProduct.product = product;
           } else {
             poolWithProduct.product = {
-              name: "Product not found",
-              description: "Product information unavailable",
+              name: 'Product not found',
+              description: 'Product information unavailable',
               unit_price: 0,
             };
           }
@@ -206,17 +193,14 @@ async function loadRequests() {
             pool: poolWithProduct,
           });
         } catch (error) {
-          console.error(
-            `Error loading product for request ${request.id}:`,
-            error,
-          );
+          console.error(`Error loading product for request ${request.id}:`, error);
           allRequests.push({
             ...request,
             pool: {
               ...request.pool,
               product: {
-                name: "Product not found",
-                description: "Product information unavailable",
+                name: 'Product not found',
+                description: 'Product information unavailable',
                 unit_price: 0,
               },
             },
@@ -224,39 +208,36 @@ async function loadRequests() {
         }
       }
     } catch (error) {
-      console.error("Error loading user requests:", error);
+      console.error('Error loading user requests:', error);
     }
 
     requestsData = allRequests;
 
-    if (loading) loading.classList.add("hidden");
+    if (loading) loading.classList.add('hidden');
   } catch (error) {
-    console.error("Error in loadRequests:", error);
-    const loading = document.getElementById("requests-loading");
-    if (loading) loading.classList.add("hidden");
-    showNotification("Error loading requests. Please refresh the page.");
+    console.error('Error in loadRequests:', error);
+    const loading = document.getElementById('requests-loading');
+    if (loading) loading.classList.add('hidden');
+    showNotification('Error loading requests. Please refresh the page.');
   }
 }
 
 function updateStats() {
   const totalRequests = requestsData.length;
-  const totalQuantity = requestsData.reduce(
-    (sum, r) => sum + (r.quantity || 0),
-    0,
-  );
+  const totalQuantity = requestsData.reduce((sum, r) => sum + (r.quantity || 0), 0);
 
-  document.getElementById("pending-count").textContent = totalRequests;
-  document.getElementById("confirmed-count").textContent = 0;
-  document.getElementById("shipped-count").textContent = 0;
-  document.getElementById("total-saved").textContent = formatCurrency(0);
+  document.getElementById('pending-count').textContent = totalRequests;
+  document.getElementById('confirmed-count').textContent = 0;
+  document.getElementById('shipped-count').textContent = 0;
+  document.getElementById('total-saved').textContent = formatCurrency(0);
 }
 
 function formatDate(dateString) {
   const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
   });
 }
 
@@ -266,7 +247,7 @@ function formatCurrency(amount) {
 
 function copyTracking(trackingNumber) {
   navigator.clipboard.writeText(trackingNumber).then(() => {
-    showNotification("Tracking number copied to clipboard!");
+    showNotification('Tracking number copied to clipboard!');
   });
 }
 
@@ -278,15 +259,15 @@ function viewPoolDetails(poolId) {
   window.location.href = `pools.html?id=${poolId}`;
 }
 
-function showNotification(message, type = "success") {
-  const bgColor = type === "error" ? "bg-red-500" : "bg-green-500";
-  const notification = document.createElement("div");
+function showNotification(message, type = 'success') {
+  const bgColor = type === 'error' ? 'bg-red-500' : 'bg-green-500';
+  const notification = document.createElement('div');
   notification.className = `fixed top-24 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-opacity`;
   notification.textContent = message;
   document.body.appendChild(notification);
 
   setTimeout(() => {
-    notification.style.opacity = "0";
+    notification.style.opacity = '0';
     setTimeout(() => notification.remove(), 300);
   }, 3000);
 }

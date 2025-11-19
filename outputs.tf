@@ -8,8 +8,6 @@ output "website_url" {
   value       = "http://${module.s3_website.s3_bucket_website_endpoint}"
 }
 
-# Outputs del proxy eliminados
-
 output "website_bucket_name" {
   description = "Nombre del bucket S3 que aloja el sitio web"
   value       = module.s3_website.s3_bucket_id

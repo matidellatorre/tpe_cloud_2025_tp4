@@ -1,5 +1,3 @@
-# s3_images.tf
-
 resource "aws_s3_bucket" "images_bucket" {
   bucket = "${var.project_name}-images-${data.aws_caller_identity.current.account_id}"
 }

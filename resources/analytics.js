@@ -15,16 +15,16 @@ async function getUserRole() {
   return role;
 }
 
-document.addEventListener("DOMContentLoaded", async function () {
+document.addEventListener('DOMContentLoaded', async function () {
   if (window.cognitoAuth && !window.cognitoAuth.isLoggedIn()) {
-    window.location.href = "login.html";
+    window.location.href = 'login.html';
     return;
   }
 
   const userRole = await getUserRole();
   if (userRole !== 'company') {
     alert('Access denied. Analytics dashboard is only available for company users.');
-    window.location.href = "index.html";
+    window.location.href = 'index.html';
     return;
   }
 
@@ -37,10 +37,7 @@ async function loadAnalyticsData() {
   try {
     showLoading();
 
-    const [overview, poolSales] = await Promise.all([
-      window.apiClient.getAnalyticsOverview(),
-      window.apiClient.getAnalyticsPoolsSales(),
-    ]);
+    const [overview, poolSales] = await Promise.all([window.apiClient.getAnalyticsOverview(), window.apiClient.getAnalyticsPoolsSales()]);
 
     updateOverviewCards(overview);
 
@@ -50,46 +47,46 @@ async function loadAnalyticsData() {
 
     hideLoading();
   } catch (error) {
-    console.error("Error loading analytics data:", error);
+    console.error('Error loading analytics data:', error);
 
     if (error.status === 403 || (error.message && (error.message.includes('403') || error.message.includes('Forbidden')))) {
       alert('Access denied. Analytics dashboard is only available for company users.');
-      window.location.href = "index.html";
+      window.location.href = 'index.html';
       return;
     }
 
-    showError("Error loading analytics data. Please try again.");
+    showError('Error loading analytics data. Please try again.');
     hideLoading();
   }
 }
 
 function updateOverviewCards(overview) {
-  const cardsContainer = document.getElementById("overview-cards");
+  const cardsContainer = document.getElementById('overview-cards');
 
   const cards = [
     {
-      title: "Total Revenue",
+      title: 'Total Revenue',
       value: formatCurrency(overview.total_revenue || 0),
-      icon: "💰",
-      color: "bg-green-500",
+      icon: '💰',
+      color: 'bg-green-500',
     },
     {
-      title: "Total Pools",
+      title: 'Total Pools',
       value: overview.total_pools || 0,
-      icon: "📦",
-      color: "bg-blue-500",
+      icon: '📦',
+      color: 'bg-blue-500',
     },
     {
-      title: "Active Pools",
+      title: 'Active Pools',
       value: overview.active_pools || 0,
-      icon: "🏊",
-      color: "bg-purple-500",
+      icon: '🏊',
+      color: 'bg-purple-500',
     },
     {
-      title: "Success Rate",
+      title: 'Success Rate',
       value: `${overview.success_rate || 0}%`,
-      icon: "📊",
-      color: "bg-yellow-500",
+      icon: '📊',
+      color: 'bg-yellow-500',
     },
   ];
 
@@ -107,36 +104,30 @@ function updateOverviewCards(overview) {
                 </div>
             </div>
         </div>
-    `
+    `,
     )
-    .join("");
+    .join('');
 }
 
 function updateCharts(overview, poolSales) {
-  const revenueCtx = document.getElementById("revenueChart").getContext("2d");
+  const revenueCtx = document.getElementById('revenueChart').getContext('2d');
 
   if (revenueChart) {
     revenueChart.destroy();
   }
 
-  const topPools = poolSales
-    .sort((a, b) => b.total_revenue - a.total_revenue)
-    .slice(0, 10);
+  const topPools = poolSales.sort((a, b) => b.total_revenue - a.total_revenue).slice(0, 10);
 
   revenueChart = new Chart(revenueCtx, {
-    type: "bar",
+    type: 'bar',
     data: {
-      labels: topPools.map(
-        (p) =>
-          p.product_name.substring(0, 20) +
-          (p.product_name.length > 20 ? "..." : "")
-      ),
+      labels: topPools.map((p) => p.product_name.substring(0, 20) + (p.product_name.length > 20 ? '...' : '')),
       datasets: [
         {
-          label: "Revenue ($)",
+          label: 'Revenue ($)',
           data: topPools.map((p) => p.total_revenue),
-          backgroundColor: "rgba(147, 51, 234, 0.6)",
-          borderColor: "rgba(147, 51, 234, 1)",
+          backgroundColor: 'rgba(147, 51, 234, 0.6)',
+          borderColor: 'rgba(147, 51, 234, 1)',
           borderWidth: 1,
         },
       ],
@@ -154,35 +145,31 @@ function updateCharts(overview, poolSales) {
           beginAtZero: true,
           ticks: {
             callback: function (value) {
-              return "$" + value.toFixed(2);
+              return '$' + value.toFixed(2);
             },
           },
         },
       },
     },
   });
-  const successCtx = document
-    .getElementById("successRateChart")
-    .getContext("2d");
+  const successCtx = document.getElementById('successRateChart').getContext('2d');
 
   if (successRateChart) {
     successRateChart.destroy();
   }
 
-  const successfulPools = poolSales.filter(
-    (p) => p.reached_min_quantity
-  ).length;
+  const successfulPools = poolSales.filter((p) => p.reached_min_quantity).length;
   const failedPools = poolSales.length - successfulPools;
 
   successRateChart = new Chart(successCtx, {
-    type: "doughnut",
+    type: 'doughnut',
     data: {
-      labels: ["Successful", "Not Reached"],
+      labels: ['Successful', 'Not Reached'],
       datasets: [
         {
           data: [successfulPools, failedPools],
-          backgroundColor: ["rgba(34, 197, 94, 0.6)", "rgba(239, 68, 68, 0.6)"],
-          borderColor: ["rgba(34, 197, 94, 1)", "rgba(239, 68, 68, 1)"],
+          backgroundColor: ['rgba(34, 197, 94, 0.6)', 'rgba(239, 68, 68, 0.6)'],
+          borderColor: ['rgba(34, 197, 94, 1)', 'rgba(239, 68, 68, 1)'],
           borderWidth: 1,
         },
       ],
@@ -192,7 +179,7 @@ function updateCharts(overview, poolSales) {
       maintainAspectRatio: true,
       plugins: {
         legend: {
-          position: "bottom",
+          position: 'bottom',
         },
       },
     },
@@ -200,11 +187,10 @@ function updateCharts(overview, poolSales) {
 }
 
 function updateSalesTable(poolSales) {
-  const tbody = document.getElementById("sales-table-body");
+  const tbody = document.getElementById('sales-table-body');
 
   if (poolSales.length === 0) {
-    tbody.innerHTML =
-      '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No pool sales data available</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No pool sales data available</td></tr>';
     return;
   }
 
@@ -212,43 +198,31 @@ function updateSalesTable(poolSales) {
     .map(
       (pool) => `
         <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${escapeHtml(
-              pool.product_name
-            )}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${
-              pool.total_quantity_sold
-            }</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${
-              pool.total_participants
-            }</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatCurrency(
-              pool.total_revenue
-            )}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${escapeHtml(pool.product_name)}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${pool.total_quantity_sold}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${pool.total_participants}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatCurrency(pool.total_revenue)}</td>
             <td class="px-6 py-4 whitespace-nowrap">
-                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  pool.reached_min_quantity
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
-                }">
-                    ${pool.reached_min_quantity ? "Success" : "Pending"}
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${pool.reached_min_quantity ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                    ${pool.reached_min_quantity ? 'Success' : 'Pending'}
                 </span>
             </td>
         </tr>
-    `
+    `,
     )
-    .join("");
+    .join('');
 }
 
 function formatCurrency(value) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
     minimumFractionDigits: 2,
   }).format(value);
 }
 
 function escapeHtml(text) {
-  const div = document.createElement("div");
+  const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
 }
@@ -262,62 +236,57 @@ function showError(message) {
 }
 
 function setupAuthUI() {
-  const logoutBtn = document.getElementById("logout-btn");
-  const authButtons = document.getElementById("auth-buttons");
-  const userInfo = document.getElementById("user-info");
-  const userMenuBtn = document.getElementById("user-menu-btn");
-  const userDropdown = document.getElementById("user-dropdown");
-  const userAvatar = document.getElementById("user-avatar");
-  const userEmail = document.getElementById("user-email");
-  const userRole = document.getElementById("user-role");
+  const logoutBtn = document.getElementById('logout-btn');
+  const authButtons = document.getElementById('auth-buttons');
+  const userInfo = document.getElementById('user-info');
+  const userMenuBtn = document.getElementById('user-menu-btn');
+  const userDropdown = document.getElementById('user-dropdown');
+  const userAvatar = document.getElementById('user-avatar');
+  const userEmail = document.getElementById('user-email');
+  const userRole = document.getElementById('user-role');
 
   function updateAuthUI() {
     if (window.cognitoAuth && window.cognitoAuth.isLoggedIn()) {
-      authButtons.classList.add("hidden");
-      userInfo.classList.remove("hidden");
+      authButtons.classList.add('hidden');
+      userInfo.classList.remove('hidden');
 
-      const email = localStorage.getItem("user_email") || "user@example.com";
-      const role = localStorage.getItem("user_role");
+      const email = localStorage.getItem('user_email') || 'user@example.com';
+      const role = localStorage.getItem('user_role');
       const initial = email.charAt(0).toUpperCase();
 
       if (userAvatar) userAvatar.textContent = initial;
       if (userEmail) userEmail.textContent = email;
       if (userRole) {
-        const roleText =
-          role === "client"
-            ? "Client"
-            : role === "company"
-            ? "Company"
-            : "User";
+        const roleText = role === 'client' ? 'Client' : role === 'company' ? 'Company' : 'User';
         userRole.textContent = `Role: ${roleText}`;
       }
     } else {
-      authButtons.classList.remove("hidden");
-      userInfo.classList.add("hidden");
+      authButtons.classList.remove('hidden');
+      userInfo.classList.add('hidden');
     }
   }
 
   if (userMenuBtn) {
-    userMenuBtn.addEventListener("click", (e) => {
+    userMenuBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      userDropdown.classList.toggle("hidden");
+      userDropdown.classList.toggle('hidden');
     });
   }
 
-  document.addEventListener("click", (e) => {
-    if (userDropdown && !userDropdown.classList.contains("hidden")) {
-      userDropdown.classList.add("hidden");
+  document.addEventListener('click', (e) => {
+    if (userDropdown && !userDropdown.classList.contains('hidden')) {
+      userDropdown.classList.add('hidden');
     }
   });
 
   if (userDropdown) {
-    userDropdown.addEventListener("click", (e) => {
+    userDropdown.addEventListener('click', (e) => {
       e.stopPropagation();
     });
   }
 
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
+    logoutBtn.addEventListener('click', () => {
       if (window.cognitoAuth) {
         window.cognitoAuth.logout();
       }

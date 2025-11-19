@@ -1,26 +1,18 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Confirm Email - Grupi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body class="bg-gray-50 min-h-screen flex items-center justify-center">
     <div class="max-w-md w-full space-y-8">
       <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Confirm Email
-        </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">
-          Enter the verification code we sent to your email
-        </p>
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Confirm Email</h2>
+        <p class="mt-2 text-center text-sm text-gray-600">Enter the verification code we sent to your email</p>
         <p class="mt-1 text-center text-sm text-gray-600">
-          <a
-            href="login.html"
-            class="font-medium text-purple-600 hover:text-purple-500"
-            >← Back to login</a
-          >
+          <a href="login.html" class="font-medium text-purple-600 hover:text-purple-500">← Back to login</a>
         </p>
       </div>
 
@@ -58,139 +50,118 @@
           >
             <span id="confirm-text">Confirm Email</span>
             <div id="confirm-loading" class="hidden ml-2">
-              <div
-                class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"
-              ></div>
+              <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
             </div>
           </button>
         </div>
 
         <div class="text-center">
-          <button
-            type="button"
-            id="resend-btn"
-            class="text-purple-600 hover:text-purple-500 text-sm font-medium"
-          >
-            Resend code
-          </button>
+          <button type="button" id="resend-btn" class="text-purple-600 hover:text-purple-500 text-sm font-medium">Resend code</button>
         </div>
 
-        <div
-          id="error-message"
-          class="hidden text-red-600 text-center text-sm"
-        ></div>
-        <div
-          id="success-message"
-          class="hidden text-green-600 text-center text-sm"
-        ></div>
+        <div id="error-message" class="hidden text-red-600 text-center text-sm"></div>
+        <div id="success-message" class="hidden text-green-600 text-center text-sm"></div>
       </form>
     </div>
 
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
+      document.addEventListener('DOMContentLoaded', function () {
         const urlParams = new URLSearchParams(window.location.search);
-        const emailFromUrl = urlParams.get("email");
-        const emailFromStorage = localStorage.getItem("pending_email");
+        const emailFromUrl = urlParams.get('email');
+        const emailFromStorage = localStorage.getItem('pending_email');
 
         const email = emailFromUrl || emailFromStorage;
-        const emailInput = document.getElementById("email");
+        const emailInput = document.getElementById('email');
 
         if (email) {
           emailInput.value = email;
-          localStorage.setItem("pending_email", email);
-          emailInput.setAttribute("readonly", "true");
-          emailInput.classList.add("bg-gray-100");
+          localStorage.setItem('pending_email', email);
+          emailInput.setAttribute('readonly', 'true');
+          emailInput.classList.add('bg-gray-100');
         } else {
           emailInput.focus();
         }
       });
 
-      document
-        .getElementById("confirm-form")
-        .addEventListener("submit", async function (e) {
-          e.preventDefault();
+      document.getElementById('confirm-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
 
-          const email = document.getElementById("email").value;
-          const code = document.getElementById("code").value;
-          const errorDiv = document.getElementById("error-message");
-          const successDiv = document.getElementById("success-message");
-          const confirmBtn = document.getElementById("confirm-btn");
-          const confirmText = document.getElementById("confirm-text");
-          const confirmLoading = document.getElementById("confirm-loading");
+        const email = document.getElementById('email').value;
+        const code = document.getElementById('code').value;
+        const errorDiv = document.getElementById('error-message');
+        const successDiv = document.getElementById('success-message');
+        const confirmBtn = document.getElementById('confirm-btn');
+        const confirmText = document.getElementById('confirm-text');
+        const confirmLoading = document.getElementById('confirm-loading');
 
-          try {
-            errorDiv.classList.add("hidden");
-            successDiv.classList.add("hidden");
-            confirmBtn.disabled = true;
-            confirmText.classList.add("hidden");
-            confirmLoading.classList.remove("hidden");
+        try {
+          errorDiv.classList.add('hidden');
+          successDiv.classList.add('hidden');
+          confirmBtn.disabled = true;
+          confirmText.classList.add('hidden');
+          confirmLoading.classList.remove('hidden');
 
-            await window.cognitoAuth.confirmSignup(email, code);
+          await window.cognitoAuth.confirmSignup(email, code);
 
-            await new Promise((resolve) => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
-            const role = localStorage.getItem("pending_role");
+          const role = localStorage.getItem('pending_role');
 
-            if (role && window.apiClient) {
-              try {
-                await window.apiClient.setUserRole(email, role);
-                localStorage.setItem("user_role", role);
-              } catch (roleError) {
-                console.error("Error setting role:", roleError);
-                localStorage.setItem("user_role", role);
-              }
-            } else if (window.apiClient) {
-              try {
-                const roleData = await window.apiClient.getUserRole();
-                if (roleData && roleData.role) {
-                  localStorage.setItem("user_role", roleData.role);
-                }
-              } catch (roleError) {
-                console.error("Error fetching role:", roleError);
-              }
-            } else if (role) {
-              console.warn(
-                "API client not available, saving role to localStorage only"
-              );
-              localStorage.setItem("user_role", role);
+          if (role && window.apiClient) {
+            try {
+              await window.apiClient.setUserRole(email, role);
+              localStorage.setItem('user_role', role);
+            } catch (roleError) {
+              console.error('Error setting role:', roleError);
+              localStorage.setItem('user_role', role);
             }
-
-            localStorage.setItem("user_email", email);
-
-            localStorage.removeItem("pending_email");
-            localStorage.removeItem("pending_role");
-            localStorage.removeItem("pending_password");
-
-            // Redirect immediately with loading still showing
-            window.location.href = "index.html";
-          } catch (error) {
-            confirmBtn.disabled = false;
-            confirmText.classList.remove("hidden");
-            confirmLoading.classList.add("hidden");
-            errorDiv.textContent = error.message || "Error confirming email";
-            errorDiv.classList.remove("hidden");
+          } else if (window.apiClient) {
+            try {
+              const roleData = await window.apiClient.getUserRole();
+              if (roleData && roleData.role) {
+                localStorage.setItem('user_role', roleData.role);
+              }
+            } catch (roleError) {
+              console.error('Error fetching role:', roleError);
+            }
+          } else if (role) {
+            console.warn('API client not available, saving role to localStorage only');
+            localStorage.setItem('user_role', role);
           }
-        });
 
-      document
-        .getElementById("resend-btn")
-        .addEventListener("click", async function () {
-          const email = document.getElementById("email").value;
-          const errorDiv = document.getElementById("error-message");
-          const successDiv = document.getElementById("success-message");
+          localStorage.setItem('user_email', email);
 
-          try {
-            errorDiv.classList.add("hidden");
-            successDiv.classList.add("hidden");
-            await window.cognitoAuth.resendConfirmationCode(email);
+          localStorage.removeItem('pending_email');
+          localStorage.removeItem('pending_role');
+          localStorage.removeItem('pending_password');
 
-            successDiv.textContent = "Code resent. Check your email.";
-            successDiv.classList.remove("hidden");
-          } catch (error) {
-            errorDiv.textContent = error.message || "Error resending code";
-            errorDiv.classList.remove("hidden");
-          }
-        });
+          window.location.href = 'index.html';
+        } catch (error) {
+          confirmBtn.disabled = false;
+          confirmText.classList.remove('hidden');
+          confirmLoading.classList.add('hidden');
+          errorDiv.textContent = error.message || 'Error confirming email';
+          errorDiv.classList.remove('hidden');
+        }
+      });
+
+      document.getElementById('resend-btn').addEventListener('click', async function () {
+        const email = document.getElementById('email').value;
+        const errorDiv = document.getElementById('error-message');
+        const successDiv = document.getElementById('success-message');
+
+        try {
+          errorDiv.classList.add('hidden');
+          successDiv.classList.add('hidden');
+          await window.cognitoAuth.resendConfirmationCode(email);
+
+          successDiv.textContent = 'Code resent. Check your email.';
+          successDiv.classList.remove('hidden');
+        } catch (error) {
+          errorDiv.textContent = error.message || 'Error resending code';
+          errorDiv.classList.remove('hidden');
+        }
+      });
     </script>
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1000.0.min.js"></script>
     <script src="config.js"></script>

@@ -68,7 +68,6 @@ def handler(event, context):
         }
 
     try:
-        # Check user role - only 'company' role can access analytics
         sub = get_user_sub_from_token(event)
 
         if not sub:
@@ -85,53 +84,48 @@ def handler(event, context):
                 "body": json.dumps({"error": "Forbidden - only company role can access analytics"}),
             }
         with conn.cursor() as cur:
-            # Get overall dashboard metrics
             overview_metrics = {}
 
-            # Total pools
             cur.execute("SELECT COUNT(*) FROM pool")
             overview_metrics["total_pools"] = cur.fetchone()[0]
 
-            # Active pools (not ended yet)
-            cur.execute("SELECT COUNT(*) FROM pool WHERE end_at >= CURRENT_DATE")
+            cur.execute("SELECT COUNT(*) FROM pool WHERE status = 'active'")
             overview_metrics["active_pools"] = cur.fetchone()[0]
 
-            # Successful pools (reached min_quantity)
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT COUNT(DISTINCT p.id)
                 FROM pool p
                 WHERE (SELECT COALESCE(SUM(r.quantity), 0)
                        FROM request r
                        WHERE r.pool_id = p.id) >= p.min_quantity
-            """)
+            """
+            )
             overview_metrics["successful_pools"] = cur.fetchone()[0]
 
-            # Total revenue
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT COALESCE(SUM(r.quantity * pr.unit_price), 0)
                 FROM request r
                 JOIN pool p ON r.pool_id = p.id
                 JOIN product pr ON p.product_id = pr.id
-            """)
+            """
+            )
             overview_metrics["total_revenue"] = float(cur.fetchone()[0])
 
-            # Total customers
             cur.execute("SELECT COUNT(DISTINCT email) FROM request")
             overview_metrics["total_customers"] = cur.fetchone()[0]
 
-            # Total products
             cur.execute("SELECT COUNT(*) FROM product")
             overview_metrics["total_products"] = cur.fetchone()[0]
 
-            # Total quantity sold
             cur.execute("SELECT COALESCE(SUM(quantity), 0) FROM request")
             overview_metrics["total_quantity_sold"] = int(cur.fetchone()[0])
 
-            # Success rate
             if overview_metrics["total_pools"] > 0:
                 overview_metrics["success_rate"] = round(
                     (overview_metrics["successful_pools"] / overview_metrics["total_pools"]) * 100,
-                    2
+                    2,
                 )
             else:
                 overview_metrics["success_rate"] = 0
@@ -157,4 +151,3 @@ def handler(event, context):
     finally:
         if conn:
             conn.close()
-

@@ -64,7 +64,7 @@ def handler(event, context):
             sub = claims.get("sub")
         except:
             pass
-        
+
         if not sub:
             return {
                 "statusCode": 401,
@@ -75,7 +75,7 @@ def handler(event, context):
         with conn.cursor() as cur:
             cur.execute(
                 """
-                UPDATE user_role 
+                UPDATE user_role
                 SET email = %s, role = %s, updated_at = CURRENT_TIMESTAMP
                 WHERE cognito_sub = %s
                 RETURNING id, email, cognito_sub, role, created_at, updated_at
@@ -83,7 +83,7 @@ def handler(event, context):
                 (email, role, sub),
             )
             result = cur.fetchone()
-            
+
             if not result:
                 try:
                     cur.execute(
@@ -99,7 +99,7 @@ def handler(event, context):
                     conn.rollback()
                     cur.execute(
                         """
-                        UPDATE user_role 
+                        UPDATE user_role
                         SET cognito_sub = %s, role = %s, updated_at = CURRENT_TIMESTAMP
                         WHERE email = %s
                         RETURNING id, email, cognito_sub, role, created_at, updated_at
@@ -107,20 +107,22 @@ def handler(event, context):
                         (sub, role, email),
                     )
                     result = cur.fetchone()
-            
+
             conn.commit()
 
             return {
                 "statusCode": 200,
                 "headers": {"Access-Control-Allow-Origin": "*"},
-                "body": json.dumps({
-                    "id": result[0],
-                    "email": result[1],
-                    "cognito_sub": result[2],
-                    "role": result[3],
-                    "created_at": result[4].isoformat(),
-                    "updated_at": result[5].isoformat(),
-                }),
+                "body": json.dumps(
+                    {
+                        "id": result[0],
+                        "email": result[1],
+                        "cognito_sub": result[2],
+                        "role": result[3],
+                        "created_at": result[4].isoformat(),
+                        "updated_at": result[5].isoformat(),
+                    }
+                ),
             }
 
     except (Exception, psycopg2.Error) as e:
@@ -139,4 +141,3 @@ def handler(event, context):
     finally:
         if conn:
             conn.close()
-

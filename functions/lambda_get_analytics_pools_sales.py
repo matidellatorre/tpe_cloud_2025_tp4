@@ -68,7 +68,6 @@ def handler(event, context):
         }
 
     try:
-        # Check user role - only 'company' role can access analytics
         sub = get_user_sub_from_token(event)
 
         if not sub:
@@ -85,8 +84,6 @@ def handler(event, context):
                 "body": json.dumps({"error": "Forbidden - only company role can access analytics"}),
             }
         with conn.cursor() as cur:
-            # Get sales metrics by pool
-            # Calculate: total quantity sold, revenue, number of participants, pool status
             cur.execute(
                 """
                 SELECT
@@ -114,18 +111,20 @@ def handler(event, context):
 
             pool_sales = []
             for row in pools:
-                pool_sales.append({
-                    "pool_id": row[0],
-                    "product_name": row[1],
-                    "unit_price": float(row[2]) if row[2] is not None else 0,
-                    "min_quantity": row[3],
-                    "start_at": row[4].isoformat() if row[4] else None,
-                    "end_at": row[5].isoformat() if row[5] else None,
-                    "total_quantity_sold": int(row[6]),
-                    "total_participants": int(row[7]),
-                    "total_revenue": float(row[8]) if row[8] is not None else 0,
-                    "reached_min_quantity": row[9],
-                })
+                pool_sales.append(
+                    {
+                        "pool_id": row[0],
+                        "product_name": row[1],
+                        "unit_price": float(row[2]) if row[2] is not None else 0,
+                        "min_quantity": row[3],
+                        "start_at": row[4].isoformat() if row[4] else None,
+                        "end_at": row[5].isoformat() if row[5] else None,
+                        "total_quantity_sold": int(row[6]),
+                        "total_participants": int(row[7]),
+                        "total_revenue": float(row[8]) if row[8] is not None else 0,
+                        "reached_min_quantity": row[9],
+                    }
+                )
 
             return {
                 "statusCode": 200,
@@ -148,4 +147,3 @@ def handler(event, context):
     finally:
         if conn:
             conn.close()
-

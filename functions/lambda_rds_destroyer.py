@@ -33,7 +33,7 @@ def drop_tables(conn):
         "DROP TABLE IF EXISTS product CASCADE;",
         "DROP TABLE IF EXISTS user_role CASCADE;",
     ]
-    
+
     drop_triggers = [
         "DROP TRIGGER IF EXISTS update_products_updated_at ON product CASCADE;",
         "DROP TRIGGER IF EXISTS update_pools_updated_at ON pool CASCADE;",
@@ -105,4 +105,3 @@ def handler(event, context):
     finally:
         if conn:
             conn.close()
-

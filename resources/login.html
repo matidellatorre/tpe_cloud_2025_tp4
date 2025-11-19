@@ -1,32 +1,22 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - Grupi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body class="bg-gray-50 min-h-screen flex items-center justify-center">
     <div class="max-w-md w-full space-y-8">
       <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Sign In
-        </h2>
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign In</h2>
         <p class="mt-2 text-center text-sm text-gray-600">
           Or
-          <a
-            href="signup.html"
-            class="font-medium text-purple-600 hover:text-purple-500"
-            >create a new account</a
-          >
+          <a href="signup.html" class="font-medium text-purple-600 hover:text-purple-500">create a new account</a>
         </p>
         <p class="mt-2 text-center text-sm text-gray-600">
           Didn't receive the verification code?
-          <a
-            href="confirm-email.html"
-            class="font-medium text-purple-600 hover:text-purple-500"
-            >Confirm email</a
-          >
+          <a href="confirm-email.html" class="font-medium text-purple-600 hover:text-purple-500">Confirm email</a>
         </p>
       </div>
       <form class="mt-8 space-y-6" id="login-form">
@@ -63,62 +53,55 @@
           >
             <span id="login-text">Sign In</span>
             <div id="login-loading" class="hidden ml-2">
-              <div
-                class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"
-              ></div>
+              <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
             </div>
           </button>
         </div>
 
-        <div
-          id="error-message"
-          class="hidden text-red-600 text-center text-sm"
-        ></div>
+        <div id="error-message" class="hidden text-red-600 text-center text-sm"></div>
       </form>
     </div>
 
     <script>
-      document
-        .getElementById("login-form")
-        .addEventListener("submit", async function (e) {
-          e.preventDefault();
+      document.getElementById('login-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
 
-          const email = document.getElementById("email").value;
-          const password = document.getElementById("password").value;
-          const errorDiv = document.getElementById("error-message");
-          const loginBtn = document.getElementById("login-btn");
-          const loginText = document.getElementById("login-text");
-          const loginLoading = document.getElementById("login-loading");
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const errorDiv = document.getElementById('error-message');
+        const loginBtn = document.getElementById('login-btn');
+        const loginText = document.getElementById('login-text');
+        const loginLoading = document.getElementById('login-loading');
+
+        try {
+          errorDiv.classList.add('hidden');
+          loginBtn.disabled = true;
+          loginText.classList.add('hidden');
+          loginLoading.classList.remove('hidden');
+
+          await window.cognitoAuth.loginWithPassword(email, password);
 
           try {
-            errorDiv.classList.add("hidden");
-            loginBtn.disabled = true;
-            loginText.classList.add("hidden");
-            loginLoading.classList.remove("hidden");
-
+            errorDiv.classList.add('hidden');
             await window.cognitoAuth.loginWithPassword(email, password);
 
-            // Save user email in localStorage
-            localStorage.setItem("user_email", email);
+            localStorage.setItem('user_email', email);
 
-            // Fetch and save user role
-            try {
-              await window.cognitoAuth.fetchAndSaveUserRole();
-            } catch (roleError) {
-              console.error("Error fetching role:", roleError);
-              // Continue anyway, role can be fetched later
-            }
-
-            // Redirect to index after successful login
-            window.location.href = "index.html";
+            window.location.href = 'index.html';
           } catch (error) {
             loginBtn.disabled = false;
-            loginText.classList.remove("hidden");
-            loginLoading.classList.add("hidden");
-            errorDiv.textContent = error.message || "Error signing in";
-            errorDiv.classList.remove("hidden");
+            loginText.classList.remove('hidden');
+            loginLoading.classList.add('hidden');
+            errorDiv.textContent = error.message || 'Error signing in';
+            errorDiv.classList.remove('hidden');
           }
-        });
+
+          window.location.href = 'index.html';
+        } catch (error) {
+          errorDiv.textContent = error.message || 'Error signing in';
+          errorDiv.classList.remove('hidden');
+        }
+      });
     </script>
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1000.0.min.js"></script>
     <script src="config.js"></script>
